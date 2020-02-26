@@ -1,0 +1,91 @@
+---
+title: "NGB project: data analysis of bacterial and fungal data on *Q. ilex* trees"
+author: "Marine Cambon"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  html_document:
+    toc: true
+    theme: cerulean
+    highlight: tango
+    code_folding: hide
+    number_sections: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/Documents/Postdoc_Biogeco/1_NGB/exploratory/Qi")
+```
+
+# Data loading
+
+The file `"~/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/data_Qi_Qr_16S_filtered_formatted.RDS"` and `"~/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/data_Qi_Qr_ITS_filtered_formatted.RDS"` are list objects with five elements:
+
+* `samples` are the samples metadata
+* `asv_table` is a ASV x samples matrix, containing read counts of ASV per samples
+* `assign` is the taxonomic assignment of each ASV
+* `asv_sequences` is a fasta file with ASV sequences associated to their name in the other datasets
+* `water_potential` is the predawn and midday water potential that have been measured concomitantly with leaf sampling for microbiota analysis
+
+```{r message=FALSE, warning=FALSE}
+rm(list=ls())
+# Load packages
+library(vegan)
+library(beanplot)
+library(ape)
+library(RColorBrewer)
+library(knitr)
+library(kableExtra)
+library(ranger)
+source("~/Documents/Postdoc_Biogeco/1_NGB/src/src_function_points_jitter.R")
+source("~/Documents/Postdoc_Biogeco/2_DROUGHT/src/src_function_conv_hull_pcoa.R")
+paf <- "~/Documents/Postdoc_Biogeco/1_NGB"
+  
+## Loading 16S data -------------
+tmp <- readRDS("~/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/data_Qi_Qr_16S_filtered_formatted.RDS")
+asv_table_16S <- tmp[["asv_table"]]
+samples_16S <- tmp[["samples"]]
+assign_16S <- tmp[["assign"]]
+wp_16S <- tmp[["water_potential"]]
+rm(tmp)
+asv_table_clr_16S <- readRDS("/home/mar/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/sequencing/processed_16S_sequences/Qi_Qr/aldex.clr_mean_asv.RDS")
+
+# remove endophytes samples from the dataset: 
+endo_16S <- subset(samples_16S, sample_type=="endo")
+asv_table_endo_16S <- asv_table_16S[,match(rownames(endo_16S),
+                                           dimnames(asv_table_16S)[[2]])]
+
+samples_16S <- subset(samples_16S, sample_type=="micro")
+asv_table_16S <- asv_table_16S[,match(rownames(samples_16S),
+                                      dimnames(asv_table_16S)[[2]])]
+
+## Loading ITS data -------------
+tmp <- readRDS("~/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/data_Qi_Qr_ITS_filtered_formatted.RDS")
+asv_table_ITS <- tmp[["asv_table"]]
+samples_ITS <- tmp[["samples"]]
+assign_ITS <- tmp[["assign"]]
+wp_ITS <- tmp[["water_potential"]]
+rm(tmp)
+asv_table_clr_ITS <- readRDS("/home/mar/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/sequencing/processed_ITS_sequences/Qi_Qr/aldex.clr_mean_asv.RDS")
+
+# remove endophytes samples from the dataset: 
+endo_ITS <- subset(samples_ITS, sample_type=="endo")
+asv_table_endo_ITS <- asv_table_ITS[,match(rownames(endo_ITS),
+                                           dimnames(asv_table_ITS)[[2]])]
+
+samples_ITS <- subset(samples_ITS, sample_type=="micro")
+asv_table_ITS <- asv_table_ITS[,match(rownames(samples_ITS),
+                                      dimnames(asv_table_ITS)[[2]])]
+
+
+# Colors 
+source("~/Documents/Postdoc_Biogeco/1_NGB/src/project_colors_v2.R")
+source("~/Documents/Postdoc_Biogeco/1_NGB/src/src_function_points_jitter.R")
+source("~/Documents/Postdoc_Biogeco/2_DROUGHT/src/src_function_conv_hull_pcoa.R")
+```
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```
