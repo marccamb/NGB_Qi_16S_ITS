@@ -662,6 +662,45 @@ conv.hull.pcoa(pp, groups = z$leaf_type, colors=hue_leaf_type)
 # dev.off()
 ```
 
+# Random forest classification
+
+```{r}
+z <- samples_16S
+tab <- asv_table_16S
+tab <- data.frame("irrigation"=z$irrigation,t(tab))
+
+# Classification forest with default settings
+
+n_fold <- 5
+error <- NULL
+res_mean <- NULL
+res_sd <- NULL
+set.seed(1409)
+train.idx <- sample(rep(1:n_fold, 1/n_fold * nrow(tab)), replace = F)
+
+for (n in 1:10) {
+  for (i in 1:n_fold) {
+    train <- tab[train.idx!=i, ]
+    test <- tab[train.idx==i, ]
+    set.seed(1409)
+    rg.irri <- ranger(irrigation ~ ., data = train, 
+                      num.trees = 500,
+                      mtry = function(x) n*x/10,
+                      importance = "impurity")
+    
+    pred.irri <- predict(rg.irri, data = test)
+    error <- c(error, sum(test$irrigation != pred.irri$predictions)/nrow(test))
+    #print(table(test$irrigation, pred.irri$predictions))
+  }
+  res_mean <- c(res_mean, mean(error))
+  res_sd <- c(res_sd, sd(error))
+}
+
+mtry <- 1:10*(ncol(tab)-1)/10
+plot(res_mean~mtry, type='l', ylim=c(0,1))
+segments(y0=res_mean+res_sd/2, x0=mtry, y1=res_mean-res_sd/2)
+```
+
 # Session info
 
 ```{r}
