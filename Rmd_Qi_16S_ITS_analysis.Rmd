@@ -47,7 +47,6 @@ samples_16S <- tmp[["samples"]]
 assign_16S <- tmp[["assign"]]
 wp_16S <- tmp[["water_potential"]]
 rm(tmp)
-asv_table_clr_16S <- readRDS("/home/mar/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/sequencing/processed_16S_sequences/Qi_Qr/aldex.clr_mean_asv.RDS")
 
 # Remove Qr samples from the dataset:
 asv_table_16S <- asv_table_16S[,-grep("PU2", colnames(asv_table_16S))]
@@ -76,7 +75,6 @@ samples_ITS <- tmp[["samples"]]
 assign_ITS <- tmp[["assign"]]
 wp_ITS <- tmp[["water_potential"]]
 rm(tmp)
-asv_table_clr_ITS <- readRDS("/home/mar/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/sequencing/processed_ITS_sequences/Qi_Qr/aldex.clr_mean_asv.RDS")
 
 # Remove Qr samples from the dataset:
 asv_table_ITS <- asv_table_ITS[,-grep("PU2", colnames(asv_table_ITS))]
@@ -265,7 +263,7 @@ readRDS("PERMANOVA_Qi_tot_16S.RDS")
 ```
 
 * Irrigation treatment explains 3% of the variance in  bacterial community composition
-* There is a significant effect of predawn water potential, but as we only have one value of wp per block, we need to disentangle the block and the irrigation effect. We should probably replace the block vrariable per a pcnm of the trees coordinates.
+* There is a significant effect of predawn water potential, but as we only have one value of wp per block, we need to disentangle the block and the irrigation effect. We should probably replace the block variable per a pcnm of the trees coordinates.
 
 
 ### Fungi
@@ -289,8 +287,151 @@ readRDS("PERMANOVA_Qi_tot_ITS.RDS")
 ```
 
 * Irrigation treatment explains 3% of the variance in fungal community composition
-* There is a significant effect of predawn water potential, but as we only have one value of wp per block, we need to disentangle the block and the irrigation effect. We should probably replace the block vrariable per a pcnm of the trees coordinates.
+* There is a significant effect of predawn water potential, but as we only have one value of wp per block, we need to disentangle the block and the irrigation effect. We should probably replace the block variable per a pcnm of the trees coordinates.
 * It looks that there are more spatial effects in fungi than in bacteria
+
+## Visualization of the irrigation treatment effect
+
+Due to the compositional nature of microbiota data and differences in sequencing depth between species, it is necessary to normalize data. I perform here a centered log-ratio (clr) transformation after modeling low count abundances with Monte Carlo replicates of the Dirichlet distribution (see Fernandes et al. (2014) Microbiome). The clr transformation shifts discrete data to continuous data.
+
+Here 128 Monte Carlo samples of the Dirichlet distribution were made for each samples. The 128 matrices obtained were then averaged, following C. Pauvert’s thesis.
+
+### Clr transformation of the data
+
+```{r clr, eval=F}
+library(ALDEx2)
+
+asv.clr <- aldex.clr(asv_table_16S, verbose=T,
+                     useMC = F, denom = "all", mc.samples = 128)
+asv.clr.mean<-sapply(getMonteCarloInstances(asv.clr),rowMeans) # Average over the different instances
+saveRDS(asv.clr.mean,"aldex_clr_mean_16S.RDS") # Write to disk
+
+asv.clr <- aldex.clr(asv_table_ITS, verbose=T,
+                     useMC = F, denom = "all", mc.samples = 128)
+asv.clr.mean<-sapply(getMonteCarloInstances(asv.clr),rowMeans) # Average over the different instances
+saveRDS(asv.clr.mean,"aldex_clr_mean_ITS.RDS") # Write to disk
+```
+
+### Bacteria
+
+```{r, fig.width=10}
+par(mfrow=c(1,2))
+z <- samples_16S
+tab <- asv_table_16S
+
+dist <- vegdist(decostand(t(tab),method="hell"), 
+                  method = "bray", binary=F)
+
+pp <- pcoa(dist)
+coul <- adjustcolor(hue_irr[z$irrigation], alpha.f = 0.6)
+
+# pdf(file.path(paf, "results/figures/fig_PCoA_hell_bray_Paracou_organ_16S.pdf"), 5, 5)
+par(bty="l",las=1, mar=c(4,4,2,1))
+plot(pp$vectors[,1], pp$vectors[,2], col=coul,
+     bg=coul, 
+     pch=21, cex=1.5,
+     col.axis="grey50",
+     cex.lab=1,
+     cex.axis=1,
+     xlab=paste("PCoA axis 1 (",round(pp$values[1,"Relative_eig"],digits = 2)*100," %)", sep=""),
+     ylab = paste("PCoA axis 2 (",round(pp$values[2,"Relative_eig"],digits = 2)*100," %)", sep=""),
+     main="Hellinger, Bray-Curtis")
+legend("bottomleft", pch=21,
+       pt.bg = hue_irr,
+       col=hue_irr,
+       legend=names(hue_irr))
+
+conv.hull.pcoa(pp, groups = z$irrigation, colors=hue_irr)
+# dev.off()
+
+z <- samples_16S
+tab <- readRDS("aldex_clr_mean_16S.RDS")
+
+dist <- vegdist(t(tab), method = "euclidian", binary=F)
+
+pp <- pcoa(dist)
+coul <- adjustcolor(hue_irr[z$irrigation], alpha.f = 0.6)
+
+# pdf(file.path(paf, "results/figures/fig_PCoA_hell_bray_Paracou_organ_16S.pdf"), 5, 5)
+par(bty="l",las=1, mar=c(4,4,2,1))
+plot(pp$vectors[,1], pp$vectors[,2], col=coul,
+     bg=coul, 
+     pch=21, cex=1.5,
+     col.axis="grey50",
+     cex.lab=1,
+     cex.axis=1,
+     xlab=paste("PCoA axis 1 (",round(pp$values[1,"Relative_eig"],digits = 2)*100," %)", sep=""),
+     ylab = paste("PCoA axis 2 (",round(pp$values[2,"Relative_eig"],digits = 2)*100," %)", sep=""),
+     main="Clr, Euclidian")
+legend("bottomleft", pch=21,
+       pt.bg = hue_irr,
+       col=hue_irr,
+       legend=names(hue_irr))
+
+conv.hull.pcoa(pp, groups = z$irrigation, colors=hue_irr)
+# dev.off()
+```
+
+### Fungi
+
+```{r, fig.width=10}
+par(mfrow=c(1,2))
+z <- samples_ITS
+tab <- asv_table_ITS
+
+dist <- vegdist(decostand(t(tab),method="hell"), 
+                  method = "bray", binary=F)
+
+pp <- pcoa(dist)
+coul <- adjustcolor(hue_irr[z$irrigation], alpha.f = 0.6)
+
+# pdf(file.path(paf, "results/figures/fig_PCoA_hell_bray_Paracou_organ_ITS.pdf"), 5, 5)
+par(bty="l",las=1, mar=c(4,4,2,1))
+plot(pp$vectors[,1], pp$vectors[,2], col=coul,
+     bg=coul, 
+     pch=21, cex=1.5,
+     col.axis="grey50",
+     cex.lab=1,
+     cex.axis=1,
+     xlab=paste("PCoA axis 1 (",round(pp$values[1,"Relative_eig"],digits = 2)*100," %)", sep=""),
+     ylab = paste("PCoA axis 2 (",round(pp$values[2,"Relative_eig"],digits = 2)*100," %)", sep=""),
+     main="Hellinger, Bray-Curtis")
+legend("bottomleft", pch=21,
+       pt.bg = hue_irr,
+       col=hue_irr,
+       legend=names(hue_irr))
+
+conv.hull.pcoa(pp, groups = z$irrigation, colors=hue_irr)
+# dev.off()
+
+z <- samples_ITS
+tab <- readRDS("aldex_clr_mean_ITS.RDS")
+
+dist <- vegdist(t(tab), method = "euclidian", binary=F)
+
+pp <- pcoa(dist)
+coul <- adjustcolor(hue_irr[z$irrigation], alpha.f = 0.6)
+
+# pdf(file.path(paf, "results/figures/fig_PCoA_hell_bray_Paracou_organ_ITS.pdf"), 5, 5)
+par(bty="l",las=1, mar=c(4,4,2,1))
+plot(pp$vectors[,1], pp$vectors[,2], col=coul,
+     bg=coul, 
+     pch=21, cex=1.5,
+     col.axis="grey50",
+     cex.lab=1,
+     cex.axis=1,
+     xlab=paste("PCoA axis 1 (",round(pp$values[1,"Relative_eig"],digits = 2)*100," %)", sep=""),
+     ylab = paste("PCoA axis 2 (",round(pp$values[2,"Relative_eig"],digits = 2)*100," %)", sep=""),
+     main="Clr, Euclidian")
+legend("bottomleft", pch=21,
+       pt.bg = hue_irr,
+       col=hue_irr,
+       legend=names(hue_irr))
+
+conv.hull.pcoa(pp, groups = z$irrigation, colors=hue_irr)
+# dev.off()
+```
+
 
 # Session info
 
