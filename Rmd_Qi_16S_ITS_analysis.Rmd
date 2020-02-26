@@ -49,6 +49,17 @@ wp_16S <- tmp[["water_potential"]]
 rm(tmp)
 asv_table_clr_16S <- readRDS("/home/mar/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/sequencing/processed_16S_sequences/Qi_Qr/aldex.clr_mean_asv.RDS")
 
+# Remove Qr samples from the dataset:
+asv_table_16S <- asv_table_16S[,-grep("PU2", colnames(asv_table_16S))]
+# Remove ASVs not present in samples:
+asv_table_16S <- asv_table_16S[apply(asv_table_16S,1,sum)>0,]
+# Remove assignation of ASVs not present in samples:
+assign_16S <- assign_16S[match(rownames(asv_table_16S),
+                                        rownames(assign_16S)),]
+# Remove Qr samples from the metadata
+samples_16S <- samples_16S[match(colnames(asv_table_16S),
+                                          rownames(samples_16S)),]
+
 # remove endophytes samples from the dataset: 
 endo_16S <- subset(samples_16S, sample_type=="endo")
 asv_table_endo_16S <- asv_table_16S[,match(rownames(endo_16S),
@@ -67,6 +78,17 @@ wp_ITS <- tmp[["water_potential"]]
 rm(tmp)
 asv_table_clr_ITS <- readRDS("/home/mar/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/sequencing/processed_ITS_sequences/Qi_Qr/aldex.clr_mean_asv.RDS")
 
+# Remove Qr samples from the dataset:
+asv_table_ITS <- asv_table_ITS[,-grep("PU2", colnames(asv_table_ITS))]
+# Remove ASVs not present in samples:
+asv_table_ITS <- asv_table_ITS[apply(asv_table_ITS,1,sum)>0,]
+# Remove assignation of ASVs not present in samples:
+assign_ITS <- assign_ITS[match(rownames(asv_table_ITS),
+                                        rownames(assign_ITS)),]
+# Remove Qr samples from the metadata
+samples_ITS <- samples_ITS[match(colnames(asv_table_ITS),
+                                          rownames(samples_ITS)),]
+
 # remove endophytes samples from the dataset: 
 endo_ITS <- subset(samples_ITS, sample_type=="endo")
 asv_table_endo_ITS <- asv_table_ITS[,match(rownames(endo_ITS),
@@ -76,13 +98,13 @@ samples_ITS <- subset(samples_ITS, sample_type=="micro")
 asv_table_ITS <- asv_table_ITS[,match(rownames(samples_ITS),
                                       dimnames(asv_table_ITS)[[2]])]
 
-
 # Colors 
 source("~/Documents/Postdoc_Biogeco/1_NGB/src/project_colors_v2.R")
 source("~/Documents/Postdoc_Biogeco/1_NGB/src/src_function_points_jitter.R")
 source("~/Documents/Postdoc_Biogeco/2_DROUGHT/src/src_function_conv_hull_pcoa.R")
 ```
 
+Sample metadata are loaded twice because samples that were successfully sequenced and that passed data curation are not exactly the same for 16S and ITS data. For now I don't want to reduce the data sets to their intersection so it is more convenient to keep these duplicated data, but I could think later of a way to merge them.
 
 # Session info
 
