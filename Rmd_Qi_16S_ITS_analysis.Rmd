@@ -26,7 +26,7 @@ The file `"~/Documents/Postdoc_Biogeco/1_NGB/data/ORPHEE_leaf_microbiota/data_Qi
 * `asv_sequences` is a fasta file with ASV sequences associated to their name in the other datasets
 * `water_potential` is the predawn and midday water potential that have been measured concomitantly with leaf sampling for microbiota analysis
 
-```{r message=FALSE, warning=FALSE}
+```{r data_loading, message=FALSE, warning=FALSE}
 rm(list=ls())
 # Load packages
 library(vegan)
@@ -110,7 +110,7 @@ Sample metadata are loaded twice because samples that were successfully sequence
 
 Calculation of classical alpha diversity indices for each sample
 
-```{r}
+```{r calcul_index}
 samples_16S$shannon <- diversity(asv_table_16S, index = "shannon", MARGIN = 2)
 samples_16S$chao1 <- estimateR(t(asv_table_16S))["S.chao1",]
 
@@ -118,7 +118,7 @@ samples_ITS$shannon <- diversity(asv_table_ITS, index = "shannon", MARGIN = 2)
 samples_ITS$chao1 <- estimateR(t(asv_table_ITS))["S.chao1",]
 ```
 
-```{r, fig.width=10}
+```{r fig_chao, fig.width=10}
 par(mfrow=c(1,2), bty="l",las=1, mar=c(4,4.5,2,0))
 beanplot(chao1~irrigation,
          data=samples_16S,
@@ -161,7 +161,7 @@ pt.jitter(samples_ITS$irrigation, samples_ITS$chao1,
 ```
 
 
-```{r, fig.width=10}
+```{r fig_shannon, fig.width=10}
 par(mfrow=c(1,2), bty="l",las=1, mar=c(4,4.5,2,0))
 beanplot(shannon~irrigation,
          data=samples_16S,
@@ -204,7 +204,7 @@ pt.jitter(samples_ITS$irrigation, samples_ITS$shannon,
 ```
 
 
-```{r, fig.width=10}
+```{r fig_seq_depth, fig.width=10}
 par(mfrow=c(1,2), bty="l",las=1, mar=c(4,4.5,2,0),
     cex.lab=1.5, col.axis="darkgray")
 plot(chao1~seq_depth, 
@@ -237,6 +237,60 @@ plot(shannon~seq_depth,
 * The chao1 index clearly depends on sequencing depth. This should be taken into account somehow. 
 
 * A sample has an extremely high number of reads in ITS run. I am not sure about what to do with it.
+
+# Community composition
+
+## Complete PERMANOVA
+
+PERMANOVA analysis based on Bray-Curtis distance.
+
+### Bacteria
+```{r permanova_16S, eval=F}
+z <- samples_16S
+tab <- asv_table_16S
+
+(p <- adonis2(t(tab)~seq_depth+irrigation/block*month*leaf_age*psi_predawn_mean_sampling, 
+              permutations = 999, method="bray",
+              data=z))
+saveRDS(p, "PERMANOVA_Qi_tot_16S.RDS")
+cat(
+kable(p[,c(1,3,5)], digits = c(0,2,3),"latex", booktabs = T)%>%
+  row_spec(c(1:6), bold = T, color = "black"),
+    file ="tab_PERMANOVA_Qi_tot_16S.txt"
+)
+```
+
+```{r}
+readRDS("PERMANOVA_Qi_tot_16S.RDS")
+```
+
+* Irrigation treatment explains 3% of the variance in  bacterial community composition
+* There is a significant effect of predawn water potential, but as we only have one value of wp per block, we need to disentangle the block and the irrigation effect. We should probably replace the block vrariable per a pcnm of the trees coordinates.
+
+
+### Fungi
+```{r permanova_ITS, eval=F}
+z <- samples_ITS
+tab <- asv_table_ITS
+
+(p <- adonis2(t(tab)~seq_depth+irrigation/block*month*leaf_age*psi_predawn_mean_sampling,
+              permutations = 999, method="bray",
+              data=z))
+saveRDS(p, "PERMANOVA_Qi_tot_ITS.RDS")
+cat(
+kable(p[,c(1,3,5)], digits = c(0,2,3),"latex", booktabs = T)%>%
+  row_spec(c(1:8, 11:13), bold = T, color = "black"),
+    file ="tab_PERMANOVA_Qi_tot_ITS.txt"
+)
+```
+
+```{r}
+readRDS("PERMANOVA_Qi_tot_ITS.RDS")
+```
+
+* Irrigation treatment explains 3% of the variance in fungal community composition
+* There is a significant effect of predawn water potential, but as we only have one value of wp per block, we need to disentangle the block and the irrigation effect. We should probably replace the block vrariable per a pcnm of the trees coordinates.
+* It looks that there are more spatial effects in fungi than in bacteria
 
 # Session info
 
