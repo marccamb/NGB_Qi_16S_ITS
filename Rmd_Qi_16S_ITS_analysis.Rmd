@@ -106,6 +106,138 @@ source("~/Documents/Postdoc_Biogeco/2_DROUGHT/src/src_function_conv_hull_pcoa.R"
 
 Sample metadata are loaded twice because samples that were successfully sequenced and that passed data curation are not exactly the same for 16S and ITS data. For now I don't want to reduce the data sets to their intersection so it is more convenient to keep these duplicated data, but I could think later of a way to merge them.
 
+# Alpha diversity
+
+Calculation of classical alpha diversity indices for each sample
+
+```{r}
+samples_16S$shannon <- diversity(asv_table_16S, index = "shannon", MARGIN = 2)
+samples_16S$chao1 <- estimateR(t(asv_table_16S))["S.chao1",]
+
+samples_ITS$shannon <- diversity(asv_table_ITS, index = "shannon", MARGIN = 2)
+samples_ITS$chao1 <- estimateR(t(asv_table_ITS))["S.chao1",]
+```
+
+```{r, fig.width=10}
+par(mfrow=c(1,2), bty="l",las=1, mar=c(4,4.5,2,0))
+beanplot(chao1~irrigation,
+         data=samples_16S,
+         log="",
+         xlab="", col.axis="darkgray",
+         what=c(0,1,1,0),
+         cex.lab=1.5,
+         cutmin=0,
+         cex.axis=1,
+         ylim=c(0,300),
+         border="gray",
+         #border=colors[c("Bp", "Pp", "Qi", "Qr")],
+         #names=c("BRAN", "CDS1","CDS2","CDS3", "MTF1", "MTF2","MTF3"),
+         ylab = "Shannon index",
+         col=as.list("white"),
+         main="Bacteria")
+
+pt.jitter(samples_16S$irrigation, samples_16S$chao1, 
+          bg = hue_irr[samples_16S$irrigation], alpha = 0.6)
+
+beanplot(chao1~irrigation,
+         data=samples_ITS,
+         log="",
+         xlab="", col.axis="darkgray",
+         what=c(0,1,1,0),
+         cex.lab=1.5,
+         cutmin=0,
+         cex.axis=1,
+         ylim=c(0,300),
+         border="gray",
+         #border=colors[c("Bp", "Pp", "Qi", "Qr")],
+         #names=c("BRAN", "CDS1","CDS2","CDS3", "MTF1", "MTF2","MTF3"),
+         ylab = "Shannon index",
+         col=as.list("white"),
+         main="Fungi")
+
+pt.jitter(samples_ITS$irrigation, samples_ITS$chao1, 
+          bg = hue_irr[samples_ITS$irrigation], alpha = 0.6)
+
+```
+
+
+```{r, fig.width=10}
+par(mfrow=c(1,2), bty="l",las=1, mar=c(4,4.5,2,0))
+beanplot(shannon~irrigation,
+         data=samples_16S,
+         log="",
+         xlab="", col.axis="darkgray",
+         what=c(0,1,1,0),
+         cex.lab=1.5,
+         cutmin=0,
+         cex.axis=1,
+         ylim=c(0,6),
+         border="gray",
+         #border=colors[c("Bp", "Pp", "Qi", "Qr")],
+         #names=c("BRAN", "CDS1","CDS2","CDS3", "MTF1", "MTF2","MTF3"),
+         ylab = "Shannon index",
+         col=as.list("white"),
+         main="Bacteria")
+
+pt.jitter(samples_16S$irrigation, samples_16S$shannon, 
+          bg = hue_irr[samples_16S$irrigation], alpha = 0.6)
+
+beanplot(shannon~irrigation,
+         data=samples_ITS,
+         log="",
+         xlab="", col.axis="darkgray",
+         what=c(0,1,1,0),
+         cex.lab=1.5,
+         cutmin=0,
+         cex.axis=1,
+         ylim=c(0,6),
+         border="gray",
+         #border=colors[c("Bp", "Pp", "Qi", "Qr")],
+         #names=c("BRAN", "CDS1","CDS2","CDS3", "MTF1", "MTF2","MTF3"),
+         ylab = "Shannon index",
+         col=as.list("white"),
+         main="Fungi")
+
+pt.jitter(samples_ITS$irrigation, samples_ITS$shannon, 
+          bg = hue_irr[samples_ITS$irrigation], alpha = 0.6)
+
+```
+
+
+```{r, fig.width=10}
+par(mfrow=c(1,2), bty="l",las=1, mar=c(4,4.5,2,0),
+    cex.lab=1.5, col.axis="darkgray")
+plot(chao1~seq_depth, 
+     col="gray", 
+     pch=21,
+     bg=adjustcolor("gray", alpha.f = 0.6),
+     main="Bacteria",
+     data=samples_16S)
+plot(chao1~seq_depth, 
+     col="gray", 
+     pch=21,
+     bg=adjustcolor("gray", alpha.f = 0.6),
+     main="Fungi",
+     data=samples_ITS)
+
+plot(shannon~seq_depth, 
+     col="gray", 
+     pch=21,
+     bg=adjustcolor("gray", alpha.f = 0.6),
+     main="Bacteria",
+     data=samples_16S)
+plot(shannon~seq_depth, 
+     col="gray", 
+     pch=21,
+     bg=adjustcolor("gray", alpha.f = 0.6),
+     main="Fungi",
+     data=samples_ITS)
+```
+
+* The chao1 index clearly depends on sequencing depth. This should be taken into account somehow. 
+
+* A sample has an extremely high number of reads in ITS run. I am not sure about what to do with it.
+
 # Session info
 
 ```{r}
