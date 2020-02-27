@@ -38,6 +38,7 @@ library(kableExtra)
 library(ranger)
 source("~/Documents/Postdoc_Biogeco/1_NGB/src/src_function_points_jitter.R")
 source("~/Documents/Postdoc_Biogeco/2_DROUGHT/src/src_function_conv_hull_pcoa.R")
+source("~/Documents/Postdoc_Biogeco/1_NGB/src/src_function_agg_table_taxo.R")
 paf <- "~/Documents/Postdoc_Biogeco/1_NGB"
   
 ## Loading 16S data -------------
@@ -664,41 +665,29 @@ conv.hull.pcoa(pp, groups = z$leaf_type, colors=hue_leaf_type)
 
 # Random forest classification
 
-```{r}
+Here, I try to predict tree irrigation treatment from their leaf microbial communities, using random forest. I will try several `mtry` parameters and toxonomical levels, following Chang et al. (2017) DOI:10.3389/fmicb.2017.00519
+
+```{r RF, eval=F}
 z <- samples_16S
 tab <- asv_table_16S
-tab <- data.frame("irrigation"=z$irrigation,t(tab))
+taxo <- assign_16S
 
-# Classification forest with default settings
+res_tot <- rf.mtry.taxo(tab, taxo, treat = z$irrigation, n_mtry = 5)
 
-n_fold <- 5
-error <- NULL
-res_mean <- NULL
-res_sd <- NULL
-set.seed(1409)
-train.idx <- sample(rep(1:n_fold, 1/n_fold * nrow(tab)), replace = F)
-
-for (n in 1:10) {
-  for (i in 1:n_fold) {
-    train <- tab[train.idx!=i, ]
-    test <- tab[train.idx==i, ]
-    set.seed(1409)
-    rg.irri <- ranger(irrigation ~ ., data = train, 
-                      num.trees = 500,
-                      mtry = function(x) n*x/10,
-                      importance = "impurity")
-    
-    pred.irri <- predict(rg.irri, data = test)
-    error <- c(error, sum(test$irrigation != pred.irri$predictions)/nrow(test))
-    #print(table(test$irrigation, pred.irri$predictions))
-  }
-  res_mean <- c(res_mean, mean(error))
-  res_sd <- c(res_sd, sd(error))
-}
-
-mtry <- 1:10*(ncol(tab)-1)/10
-plot(res_mean~mtry, type='l', ylim=c(0,1))
-segments(y0=res_mean+res_sd/2, x0=mtry, y1=res_mean-res_sd/2)
+plot(res_mean~mtry, type='n', ylim=c(0,1), xlim=c(0,200),
+     data=res_tot[["ASV"]])
+lapply(res_tot, function(x){
+  lines(res_mean~mtry, ylim=c(0,1), type="b", data=x)
+  # segments(y0=x[,"res_mean"]+x[,"res_sd"], 
+  #          x0=x[,"mtry"], 
+  #          y1=x[,"res_mean"]-x[,"res_sd"])
+  polygon(c(x[,"mtry"], rev(x[,"mtry"])),
+          c(x[,"res_mean"]+x[,"res_sd"],
+            rev(x[,"res_mean"]-x[,"res_sd"])),
+          col=adjustcolor("gray", alpha.f = 0.5),
+          border=adjustcolor("gray", alpha.f = 0.5)
+  )
+})
 ```
 
 # Session info
