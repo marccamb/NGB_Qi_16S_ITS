@@ -11,15 +11,15 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
                          n_mtry = 5,
                          seed=1409) {
   # For debugging:
-  l <- "ASV"
-  i <- 1
-  n <- 1
-  n_fold <- 5
-  n_mtry <- 5
-  seed <- 1409
-  tax.table <- taxo
-  variable <- "irrigation"
-  treat <- z$irrigation
+  # l <- "ASV"
+  # i <- 1
+  # n <- 1
+  # n_fold <- 5
+  # n_mtry <- 5
+  # seed <- 1409
+  # tax.table <- taxo
+  # variable <- "irrigation"
+  # treat <- z$irrigation
   
   
   set.seed(seed)
