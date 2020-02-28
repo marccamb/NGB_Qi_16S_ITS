@@ -33,7 +33,7 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
       tab_agg <- agg.table.taxo(tab, tax.lvl = l, taxo)
     }
     tab_agg <- data.frame("treat" = treat, t(tab_agg))
-    
+    if (n_mtry+1>ncol(tab_agg)) n_mtry <- ncol(tab_agg)-1 
     mtry <- 1:n_mtry*(ncol(tab_agg)-1)/n_mtry
     error <- NULL
     res_mean <- NULL
