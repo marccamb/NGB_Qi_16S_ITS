@@ -35,7 +35,9 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
     tab_agg <- data.frame("treat" = treat, t(tab_agg))
     if (n_mtry+1>ncol(tab_agg)) n_mtry <- ncol(tab_agg)-1 
     mtry <- 1:n_mtry*(ncol(tab_agg)-1)/n_mtry
-    error <- NULL
+    error <- data.frame()
+    TP <- TN <- FP <- FN <- NULL
+    rate <- NULL
     res_mean <- NULL
     res_sd <- NULL
     
@@ -50,13 +52,21 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
                           importance = "impurity")
         
         pred.irri <- predict(rg.irri, data = test)
-        error <- c(error, sum(test$treat != pred.irri$predictions)/nrow(test))
+        data.frame(table(pred.irri$predictions, test$treat))
+        error <- rbind(error, data.frame(table(pred.irri$predictions, test$treat)))
+        rate <- c(rate, sum(test$treat != pred.irri$predictions)/nrow(test))
         #print(table(test$irrigation, pred.irri$predictions))
       }
-      res_mean <- c(res_mean, mean(error))
-      res_sd <- c(res_sd, sd(error))
+      TN <- c(TN, mean(error[error$Var1=="irr" & error$Var2=="irr","Freq"]))
+      TP <- c(TP, mean(error[error$Var1=="non-irr" & error$Var2=="non-irr","Freq"]))
+      FN <- c(FN, mean(error[error$Var1=="non-irr" & error$Var2=="irr","Freq"]))
+      FP <- c(FP, mean(error[error$Var1=="irr" & error$Var2=="non-irr","Freq"]))
+      res_mean <- c(res_mean, mean(rate))
+      res_sd <- c(res_sd, sd(rate))
     }
-    res_tot[[l]] <- cbind(res_mean, res_sd, mtry)
+    res_tot[[l]] <- data.frame(cbind(TP, TN, FP, FN, res_mean, res_sd, mtry))
+    res_tot[[l]]$sensitivity <- with(res_tot[[l]], TP/(TP+FN))
+    res_tot[[l]]$precision <- with(res_tot[[l]], TP/(TP+FP))
     message(l, " lvl is done\n")
   }
   return(res_tot)
