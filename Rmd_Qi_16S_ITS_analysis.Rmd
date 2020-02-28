@@ -668,13 +668,31 @@ conv.hull.pcoa(pp, groups = z$leaf_type, colors=hue_leaf_type)
 Here, I try to predict tree irrigation treatment from their leaf microbial communities, using random forest. I will try several `mtry` parameters and toxonomical levels, following Chang et al. (2017) DOI:10.3389/fmicb.2017.00519
 
 ```{r RF, eval=F}
+source("src_function_rf_mtry_taxo.R")
+# 16S
 z <- samples_16S
 tab <- asv_table_16S
 taxo <- assign_16S
 
-res_tot <- rf.mtry.taxo(tab, taxo, treat = z$irrigation, n_mtry = 5)
+res_tot <- rf.mtry.taxo(tab, taxo, 
+                        treat = z$irrigation, 
+                        n_mtry = 20)
 
-plot(res_mean~mtry, type='n', ylim=c(0,1), xlim=c(0,200),
+saveRDS(res_tot, "rf_irr_mtry_20_taxo_16S.RDS")
+
+#ITS
+z <- samples_ITS
+tab <- asv_table_ITS
+taxo <- assign_ITS
+
+res_tot <- rf.mtry.taxo(tab, taxo, 
+                        treat = z$irrigation, 
+                        n_mtry = 20)
+saveRDS(res_tot, "rf_irr_mtry_20_taxo_ITS.RDS")
+```
+
+```{r}
+plot(res_mean~mtry, type='n', ylim=c(0,1), #xlim=c(0,200),
      data=res_tot[["ASV"]])
 lapply(res_tot, function(x){
   lines(res_mean~mtry, ylim=c(0,1), type="b", data=x)
