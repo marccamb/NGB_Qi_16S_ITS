@@ -38,8 +38,8 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
     error <- data.frame()
     TP <- TN <- FP <- FN <- NULL
     rate <- NULL
-    res_mean <- NULL
-    res_sd <- NULL
+    err_mean <- NULL
+    err_sd <- NULL
     
     for (n in 1:n_mtry) {
       for (i in 1:n_fold) {
@@ -61,10 +61,10 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
       TP <- c(TP, mean(error[error$Var1=="non-irr" & error$Var2=="non-irr","Freq"]))
       FN <- c(FN, mean(error[error$Var1=="non-irr" & error$Var2=="irr","Freq"]))
       FP <- c(FP, mean(error[error$Var1=="irr" & error$Var2=="non-irr","Freq"]))
-      res_mean <- c(res_mean, mean(rate))
-      res_sd <- c(res_sd, sd(rate))
+      err_mean <- c(err_mean, mean(rate))
+      err_sd <- c(err_sd, sd(rate))
     }
-    res_tot[[l]] <- data.frame(cbind(TP, TN, FP, FN, res_mean, res_sd, mtry))
+    res_tot[[l]] <- data.frame(cbind(TP, TN, FP, FN, err_mean, err_sd, mtry))
     res_tot[[l]]$sensitivity <- with(res_tot[[l]], TP/(TP+FN))
     res_tot[[l]]$precision <- with(res_tot[[l]], TP/(TP+FP))
     message(l, " lvl is done\n")
