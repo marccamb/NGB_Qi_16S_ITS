@@ -264,6 +264,54 @@ readRDS("PERMANOVA_Qi_tot_16S.RDS")
 * Irrigation treatment explains 3% of the variance in  bacterial community composition
 * There is a significant effect of predawn water potential, but as we only have one value of wp per block, we need to disentangle the block and the irrigation effect. We should probably replace the block variable per a pcnm of the trees coordinates.
 
+#### Taking into account spatial effects
+
+Following: http://www.hiercourse.com/docs/variationPartitioning.html
+
+```{r, eval=F}
+tree.pcnm <- pcnm(dist(samples_16S[,grep("L93", colnames(samples_16S))]))
+str(scores(tree.pcnm))
+
+mod.pcnm <- capscale(t(asv_table_16S) ~ .,
+                     data=as.data.frame(scores(tree.pcnm)), 
+                     distance='bray')
+
+mod0.pcnm <- capscale(t(asv_table_16S) ~ 1,
+                      data=as.data.frame(scores(tree.pcnm)), 
+                      distance='bray')
+
+step.pcnm <- ordistep(mod0.pcnm, scope=formula(mod.pcnm))
+
+step.pcnm$anova
+
+pos <- gsub("\\+ ", "", rownames(step.pcnm$anova))
+tree.pcnm.sign <- scores(tree.pcnm)[,pos]
+saveRDS(tree.pcnm.sign, "step_pcnm_signif_16S.RDS")
+```
+
+```{r, eval=F}
+tree.pcnm.sign <- readRDS("step_pcnm_signif_16S.RDS")
+z <- samples_16S
+tab <- asv_table_16S
+
+(p <- adonis2(t(tab)~seq_depth+irrigation*tree.pcnm.sign*month*leaf_age*psi_predawn_mean_sampling, 
+              permutations = 999, method="bray",
+              data=z))
+
+saveRDS(p, "PERMANOVA_Qi_tot_pcnm_16S.RDS")
+# cat(
+# kable(p[,c(1,3,5)], digits = c(0,2,3),"latex", booktabs = T)%>%
+#   row_spec(c(1:6), bold = T, color = "black"),
+#     file ="tab_PERMANOVA_Qi_tot_pcnm_16S.txt"
+# )
+```
+
+
+```{r}
+readRDS("PERMANOVA_Qi_tot_pcnm_16S.RDS")
+```
+
+I don't know yet how to interprete this. Maybe I should specify all variables from pcnm separatly?
 
 ### Fungi
 ```{r permanova_ITS, eval=F}
