@@ -665,7 +665,7 @@ conv.hull.pcoa(pp, groups = z$leaf_type, colors=hue_leaf_type)
 
 # Random forest classification
 
-Here, I try to predict tree irrigation treatment from their leaf microbial communities, using random forest. I will try several `mtry` parameters and toxonomical levels, following Chang et al. (2017) DOI:10.3389/fmicb.2017.00519
+Here, I try to predict tree irrigation treatment from their leaf microbial communities, using random forest. I will try several `mtry` parameters and taxonomic levels, following Chang et al. (2017) DOI:10.3389/fmicb.2017.00519
 
 ```{r RF, eval=F}
 source("src_function_rf_mtry_taxo.R")
@@ -674,11 +674,26 @@ z <- samples_16S
 tab <- asv_table_16S
 taxo <- assign_16S
 
-res_tot <- rf.mtry.taxo(tab, taxo, 
+res_tot <- rf.mtry.taxo(tab, taxo,
                         treat = z$irrigation, 
                         n_mtry = 20)
 
 saveRDS(res_tot, "rf_irr_mtry_20_taxo_16S.RDS")
+
+res_tot <- rf.mtry.taxo(tab, taxo, n_fold = 3,
+                        treat = z$irrigation, 
+                        n_mtry = 20)
+
+saveRDS(res_tot, "rf_irr_mtry_20_nfold_3_taxo_16S.RDS")
+
+tab <- asv_table_16S[apply(asv_table_16S, 1, sum)>0.001*sum(asv_table_16S),]
+taxo <- assign_16S[rownames(tab),]
+res_tot <- rf.mtry.taxo(tab, taxo,
+                        treat = z$irrigation, 
+                        n_mtry = 20)
+
+saveRDS(res_tot, "rf_irr_0001cutoff_mtry_20_nfold_5_taxo_16S.RDS")
+
 
 #ITS
 z <- samples_ITS
@@ -689,24 +704,143 @@ res_tot <- rf.mtry.taxo(tab, taxo,
                         treat = z$irrigation, 
                         n_mtry = 20)
 saveRDS(res_tot, "rf_irr_mtry_20_taxo_ITS.RDS")
+
+res_tot <- rf.mtry.taxo(tab, taxo, n_fold = 3,
+                        treat = z$irrigation, 
+                        n_mtry = 20)
+
+saveRDS(res_tot, "rf_irr_mtry_20_nfold_3_taxo_ITS.RDS")
+
+tab <- asv_table_ITS[apply(asv_table_ITS, 1, sum)>0.001*sum(asv_table_ITS),]
+taxo <- assign_ITS[rownames(tab),]
+res_tot <- rf.mtry.taxo(tab, taxo,
+                        treat = z$irrigation, 
+                        n_mtry = 20)
+
+saveRDS(res_tot, "rf_irr_0001cutoff_mtry_20_nfold_5_taxo_ITS.RDS")
+
+# Both
+
+foo <- c(colnames(asv_table_16S), colnames(asv_table_ITS))
+foo <- foo[duplicated(foo)]
+tab <- rbind(asv_table_16S[,foo], asv_table_ITS[,foo])
+taxo <- rbind(assign_16S, assign_ITS)
+z <- samples_16S[match(foo, rownames(samples_16S)),]
+
+res_tot <- rf.mtry.taxo(tab, taxo, 
+                        treat = z$irrigation, 
+                        n_mtry = 20)
+
+saveRDS(res_tot, "rf_irr_mtry_20_taxo_16S_ITS.RDS")
+
+res_tot <- rf.mtry.taxo(tab, taxo, n_fold = 3,
+                        treat = z$irrigation, 
+                        n_mtry = 20)
+
+saveRDS(res_tot, "rf_irr_mtry_20_nfold_3_taxo_16S_ITS.RDS")
+
+p <- apply(tab, 1, sum)>0.001*sum(tab)
+tab <- tab[p,]
+taxo <- taxo[p,]
+res_tot <- rf.mtry.taxo(tab, taxo,
+                        treat = z$irrigation, 
+                        n_mtry = 20)
+
+saveRDS(res_tot, "rf_irr_0001cutoff_mtry_20_nfold_5_taxo_16S_ITS.RDS")
 ```
 
+Here is a graph that shows the precision and specificity of predictions obtained with several sizes of the dataset and taxonomic level. Colored dots represent the predictions obtained with the mtry that gave the lowest error rate. Other mtry values are in gray. 
 ```{r}
-plot(res_mean~mtry, type='n', ylim=c(0,1), #xlim=c(0,200),
-     data=res_tot[["ASV"]])
-lapply(res_tot, function(x){
-  lines(res_mean~mtry, ylim=c(0,1), type="b", data=x)
-  # segments(y0=x[,"res_mean"]+x[,"res_sd"], 
-  #          x0=x[,"mtry"], 
-  #          y1=x[,"res_mean"]-x[,"res_sd"])
-  polygon(c(x[,"mtry"], rev(x[,"mtry"])),
-          c(x[,"res_mean"]+x[,"res_sd"],
-            rev(x[,"res_mean"]-x[,"res_sd"])),
-          col=adjustcolor("gray", alpha.f = 0.5),
-          border=adjustcolor("gray", alpha.f = 0.5)
-  )
-})
+foo <- list.files(pattern = "rf_irr.*.RDS")
+
+par(mfrow=c(1,1), bty="l",las=1, mar=c(4,4,2,1), col.axis="gray", cex.lab=1.5)
+plot(c(0.6,1), c(0.6,1), type="n", xlab="Precision", ylab="Sensitivity")
+for (j in 1:length(foo)) {
+  d <- readRDS(foo[j])
+  for (i in 1:length(d)) {
+    points(sensitivity~precision, 
+           pch=c(1:length(foo))[j], col="lightgray",
+           data=d[[i]][-which.min(d[[i]]$err_mean),])
+  }
+}
+for (j in 1:length(foo)) {
+  d <- readRDS(foo[j])
+  for (i in 1:length(d)) {
+    points(sensitivity~precision, cex=2, 
+           pch=c(1:length(foo))[j], col=c(1:length(d))[i],
+           data=d[[i]][which.min(d[[i]]$err_mean),])
+  }
+}
+legend("topleft", pch=1:length(foo), col=1,bty = "n",
+       legend=gsub("rf_irr_(.*)\\.RDS","\\1",foo),
+       cex = 0.7)
+
+legend("left", pch=1, col=1:length(d),bty = "n",
+       legend=names(d),
+       cex = 0.7)
+
+# plot(res_mean~mtry, type='n', ylim=c(0,1), #xlim=c(0,200),
+#      data=rf_16S[["ASV"]])
+# lapply(rf_16S, function(x){
+#   lines(res_mean~mtry, ylim=c(0,1), type="b", data=x)
+#   # segments(y0=x[,"res_mean"]+x[,"res_sd"], 
+#   #          x0=x[,"mtry"], 
+#   #          y1=x[,"res_mean"]-x[,"res_sd"])
+#   polygon(c(x[,"mtry"], rev(x[,"mtry"])),
+#           c(x[,"res_mean"]+x[,"res_sd"],
+#             rev(x[,"res_mean"]-x[,"res_sd"])),
+#           col=adjustcolor("gray", alpha.f = 0.5),
+#           border=adjustcolor("gray", alpha.f = 0.5)
+#   )
+# })
 ```
+For the ASV level which have the best predictive power, 3 fold or 5 fold cross validations seemed to lead to the same results. I will thus remove 3-fold cross validation to improve readability.
+
+```{r}
+foo <- list.files(pattern = "rf_irr.*.RDS")
+foo <- foo[-grep("nfold_3", foo)]
+
+par(mfrow=c(1,1), bty="l",las=1, mar=c(4,4,2,1), col.axis="gray", cex.lab=1.5)
+plot(c(0.6,1), c(0.6,1), type="n", xlab="Precision", ylab="Sensitivity")
+res_err_rate <- NULL
+for (j in 1:length(foo)) {
+  d <- readRDS(foo[j])
+  for (i in 1:length(d)) {
+    points(sensitivity~precision, 
+           pch=c(0,1,2,15,16,17)[j], col="lightgray",
+           data=d[[i]][-which.min(d[[i]]$err_mean),])
+    res_err_rate <- c(res_err_rate, min(d[[i]]$err_mean))
+  }
+}
+for (j in 1:length(foo)) {
+  d <- readRDS(foo[j])
+  for (i in 1:length(d)) {
+    points(sensitivity~precision, cex=2, 
+           pch=c(0,1,2,15,16,17)[j], col=c(1:length(d))[i],
+           data=d[[i]][which.min(d[[i]]$err_mean),])
+  }
+}
+legend("topleft", pch=c(0,1,2,15,16,17), col=1,bty = "n",
+       legend=gsub("rf_irr_(.*)\\.RDS","\\1",foo),
+       cex = 0.7)
+
+legend("left", pch=1, col=1:length(d),bty = "n",
+       legend=names(d),
+       cex = 0.7)
+```
+
+In the best case, the error rate is 5 %.
+
+## Conclusions for random forest analysis:
+
+The best prediction is obtained by 
+
+* trying several mtry values
+* combining both 16S and ITS data 
+* at the ASV level (no need for a clean reference database!)
+* including or not rare ASVs (no need for deep sequencing depth)
+
+
 
 # Session info
 
