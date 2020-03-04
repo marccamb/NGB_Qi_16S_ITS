@@ -51,7 +51,7 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
         for (i in 1:n_fold) {
           train <- tab_agg[train.idx != i, ]
           test <- tab_agg[train.idx == i, ]
-          set.seed(1409)
+          set.seed(seed)
           rg.irri <- ranger(treat ~ ., data = train, 
                             num.trees = 500,
                             mtry = function(x) n*x/n_mtry,
@@ -89,5 +89,41 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
     res_tot[[l]]$precision <- with(res_tot[[l]], TP/(TP+FP))
     message(l, " lvl is done\n")
   }
+  return(res_tot)
+}
+
+rf.nfold <- function(tab, treat,
+                     n_fold = 5, 
+                     mtry = NULL,
+                     seed=1409) {
+  set.seed(seed)
+  train.idx <- sample(rep(1:n_fold, 1/n_fold * ncol(tab)), replace = F)
+  tab <- data.frame("treat" = treat, t(tab))  
+  pred.irri <- error <- rate <- NULL
+  res <- data.frame()
+  importance <- list()
+  for (i in 1:n_fold) {
+    train <- tab[train.idx != i, ]
+    test <- tab[train.idx == i, ]
+    set.seed(seed)
+    rg.irri <- ranger(treat ~ ., data = train, 
+                      num.trees = 500,
+                      mtry = 540,
+                      importance = "impurity")
+    
+    pred.irri <- predict(rg.irri, data = test)
+    error <- data.frame(table(pred.irri$predictions, test$treat))
+    err_rate <- sum(test$treat != pred.irri$predictions)/nrow(test)
+    TN <- error[error$Var1=="irr" & error$Var2=="irr","Freq"]
+    TP <- error[error$Var1=="non-irr" & error$Var2=="non-irr","Freq"]
+    FN <- error[error$Var1=="non-irr" & error$Var2=="irr","Freq"]
+    FP <- error[error$Var1=="irr" & error$Var2=="non-irr","Freq"]
+    sensitivity <- TP/(TP+FN)
+    precision <- TP/(TP+FP)
+    res <- rbind(res, cbind(TP, TN, FP, FN, err_rate, sensitivity, precision))
+    importance[[i]] <- rg.irri$variable.importance
+  }
+  res_tot <- list(res, importance)
+  names(res_tot) <- c("confusion", "importance")
   return(res_tot)
 }
