@@ -44,15 +44,14 @@ rf.nfold.mtry.taxo <- function(tab, tax.table, treat,
     # Defining all the variables that will be returned for each
     #   taxo level
     mtry <- 1:n_mtry*(ncol(tab_agg)-1)/n_mtry
-    err_mean <- NULL
-    err_sd <- NULL
-    TP_mean <- TN_mean <- FP_mean <- FN_mean <- NULL
-    TP_sd <- TN_sd <- FP_sd <- FN_sd <- NULL
-    sensitivity_mean <- precision_mean <- NULL
-    sensitivity_sd <- precision_sd <- NULL
-    
     for (n in 1:n_mtry) {
       # Defining the variables for a given mtry
+      err_mean <- NULL
+      err_sd <- NULL
+      TP_mean <- TN_mean <- FP_mean <- FN_mean <- NULL
+      TP_sd <- TN_sd <- FP_sd <- FN_sd <- NULL
+      sensitivity_mean <- precision_mean <- NULL
+      sensitivity_sd <- precision_sd <- NULL
       confusion <- data.frame()
       rate <- sensitivity <- precision <- NULL
       # if (is.na(train.id)) {
