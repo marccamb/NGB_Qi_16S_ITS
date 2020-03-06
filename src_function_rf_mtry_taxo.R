@@ -6,7 +6,7 @@
 # 2020-02-27
 # Marine C. Cambon
 
-rf.mtry.taxo <- function(tab, tax.table, treat,
+rf.nfold.mtry.taxo <- function(tab, tax.table, treat,
                          n_fold = 5, 
                          n_mtry = 5,
                          train.id = NA, 
@@ -39,16 +39,23 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
       tab_agg <- agg.table.taxo(tab, tax.lvl = l, taxo)
     }
     tab_agg <- data.frame("treat" = treat, t(tab_agg))
-    if (n_mtry+1>ncol(tab_agg)) n_mtry <- ncol(tab_agg)-1 
+    if (n_mtry+1>ncol(tab_agg)) n_mtry <- ncol(tab_agg)-1
+    
+    # Defining all the variables that will be returned for each
+    #   taxo level
     mtry <- 1:n_mtry*(ncol(tab_agg)-1)/n_mtry
     err_mean <- NULL
     err_sd <- NULL
-    TP <- TN <- FP <- FN <- NULL
+    TP_mean <- TN_mean <- FP_mean <- FN_mean <- NULL
+    TP_sd <- TN_sd <- FP_sd <- FN_sd <- NULL
+    sensitivity_mean <- precision_mean <- NULL
+    sensitivity_sd <- precision_sd <- NULL
     
     for (n in 1:n_mtry) {
-      error <- data.frame()
-      rate <- NULL
-      if (is.na(train.id)) {
+      # Defining the variables for a given mtry
+      confusion <- data.frame()
+      rate <- sensitivity <- precision <- NULL
+      # if (is.na(train.id)) {
         for (i in 1:n_fold) {
           train <- tab_agg[train.idx != i, ]
           test <- tab_agg[train.idx == i, ]
@@ -59,34 +66,61 @@ rf.mtry.taxo <- function(tab, tax.table, treat,
                             importance = "impurity")
           
           pred.irri <- predict(rg.irri, data = test)
-          #data.frame(table(pred.irri$predictions, test$treat))
-          error <- rbind(error, data.frame(table(pred.irri$predictions, test$treat)))
-          rate <- c(rate, sum(test$treat != pred.irri$predictions)/nrow(test))
-          #print(table(test$irrigation, pred.irri$predictions))
+          error <- data.frame(table(pred.irri$predictions, test$treat))
+          TN <- error[error$Var1=="irr" & error$Var2=="irr","Freq"]
+          TP <- error[error$Var1=="non-irr" & error$Var2=="non-irr","Freq"]
+          FN <- error[error$Var1=="non-irr" & error$Var2=="irr","Freq"]
+          FP <- error[error$Var1=="irr" & error$Var2=="non-irr","Freq"]
+          confusion <- rbind(confusion, error)
+          rate <- c(rate, (FP+FN)/(FP+FN+TP+TN))
+          sensitivity <- c(sensitivity, TP/(TP+FN))
+          precision <- c(precision, TP/(TP+FP))
         }
-      } else {
-        train <- tab_agg[train.idx, ]
-        test <- tab_agg[-train.idx, ]
-        set.seed(seed)
-        rg.irri <- ranger(treat ~ ., data = train, 
-                          num.trees = 500,
-                          mtry = function(x) n*x/n_mtry,
-                          importance = "impurity")
-        
-        pred.irri <- predict(rg.irri, data = test)
-        error <- rbind(error, data.frame(table(pred.irri$predictions, test$treat)))
-        rate <- c(rate, sum(test$treat != pred.irri$predictions)/nrow(test))
-      }
-      TN <- c(TN, mean(error[error$Var1=="irr" & error$Var2=="irr","Freq"]))
-      TP <- c(TP, mean(error[error$Var1=="non-irr" & error$Var2=="non-irr","Freq"]))
-      FN <- c(FN, mean(error[error$Var1=="non-irr" & error$Var2=="irr","Freq"]))
-      FP <- c(FP, mean(error[error$Var1=="irr" & error$Var2=="non-irr","Freq"]))
+      # } else {
+      #   train <- tab_agg[train.idx, ]
+      #   test <- tab_agg[-train.idx, ]
+      #   set.seed(seed)
+      #   rg.irri <- ranger(treat ~ ., data = train, 
+      #                     num.trees = 500,
+      #                     mtry = function(x) n*x/n_mtry,
+      #                     importance = "impurity")
+      #   
+      #   pred.irri <- predict(rg.irri, data = test)
+      #   error <- data.frame(table(pred.irri$predictions, test$treat))
+      #   TN <- error[error$Var1=="irr" & error$Var2=="irr","Freq"]
+      #   TP <- error[error$Var1=="non-irr" & error$Var2=="non-irr","Freq"]
+      #   FN <- error[error$Var1=="non-irr" & error$Var2=="irr","Freq"]
+      #   FP <- error[error$Var1=="irr" & error$Var2=="non-irr","Freq"]
+      #   confusion <- rbind(confusion, error)
+      #   rate <- c(rate, (FP+FN)/(FP+FN+VP+VN))
+      #   sensitivity <- c(sensitivity, TP/(TP+FN))
+      #   precision <- c(precision, TP/(TP+FP))
+      # }
+      TN_mean <- c(TN_mean, mean(confusion[confusion$Var1=="irr" & confusion$Var2=="irr","Freq"]))
+      TP_mean <- c(TP_mean, mean(confusion[confusion$Var1=="non-irr" & confusion$Var2=="non-irr","Freq"]))
+      FN_mean <- c(FN_mean, mean(confusion[confusion$Var1=="non-irr" & confusion$Var2=="irr","Freq"]))
+      FP_mean <- c(FP_mean, mean(confusion[confusion$Var1=="irr" & confusion$Var2=="non-irr","Freq"]))
+      TN_sd <- c(TN_sd, sd(confusion[confusion$Var1=="irr" & confusion$Var2=="irr","Freq"]))
+      TP_sd <- c(TP_sd, sd(confusion[confusion$Var1=="non-irr" & confusion$Var2=="non-irr","Freq"]))
+      FN_sd <- c(FN_sd, sd(confusion[confusion$Var1=="non-irr" & confusion$Var2=="irr","Freq"]))
+      FP_sd <- c(FP_sd, sd(confusion[confusion$Var1=="irr" & confusion$Var2=="non-irr","Freq"]))
       err_mean <- c(err_mean, mean(rate))
       err_sd <- c(err_sd, sd(rate))
+      sensitivity_mean <- c(sensitivity_mean, mean(sensitivity))
+      precision_mean <- c(precision_mean, mean(precision))
+      sensitivity_sd <- c(sensitivity_sd, sd(sensitivity))
+      precision_sd <- c(precision_sd, sd(precision))
     }
-    res_tot[[l]] <- data.frame(cbind(TP, TN, FP, FN, err_mean, err_sd, mtry))
-    res_tot[[l]]$sensitivity <- with(res_tot[[l]], TP/(TP+FN))
-    res_tot[[l]]$precision <- with(res_tot[[l]], TP/(TP+FP))
+    res_tot[[l]] <- data.frame(cbind(TP_mean, TP_sd, 
+                                     TN_mean, TN_sd, 
+                                     FP_mean, FP_sd, 
+                                     FN_mean, FN_sd, 
+                                     err_mean, err_sd,
+                                     sensitivity_mean,
+                                     sensitivity_sd,
+                                     precision_mean,
+                                     precision_sd,
+                                     mtry))
     message(l, " lvl is done\n")
   }
   return(res_tot)
