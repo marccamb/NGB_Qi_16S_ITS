@@ -15,9 +15,9 @@ rf.nfold(tab, treat, n_fold = 5, mtry = NULL, seed = 1409)
 
 \item{mtry}{The mtry parameter to be passed to the \code{ranger} function. See \code{ranger} documentation for details.}
 
-\item{seed}{A number to set seed before sampling samples in the n-folding process and before growing each forest. The default is \code{NA}.}
+\item{seed}{A number to set the seed before before growing each forest. The default is \code{NA}.}
 
-\item{n_try}{The number of tree to grow.}
+\item{n_tree}{The number of tree to grow. The default is \code{500}.}
 }
 \value{
 A list...
