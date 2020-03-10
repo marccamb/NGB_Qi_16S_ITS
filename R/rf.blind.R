@@ -37,22 +37,22 @@ rf.blind <- function(tab, treat,
   importance <- list()
   for (i in 1:n.forest) {
     message("Growing forest number ", i, "...")
-    #set.seed(140)
+    #set.seed(seed)
     rg.irri <- ranger::ranger(treat ~ ., data = train,
                       num.trees = n.tree,
                       mtry = mtry,
                       importance = "impurity")
 
     pred.irri <- stats::predict(rg.irri, data = test)
-    error <- data.frame(table(pred.irri$predictions, test$treat))
-    err_rate <- sum(test$treat != pred.irri$predictions)/nrow(test)
-    TN <- error[error$Var1=="irr" & error$Var2=="irr","Freq"]
-    TP <- error[error$Var1=="non-irr" & error$Var2=="non-irr","Freq"]
-    FN <- error[error$Var1=="non-irr" & error$Var2=="irr","Freq"]
-    FP <- error[error$Var1=="irr" & error$Var2=="non-irr","Freq"]
+    tmp <- data.frame(table(pred.irri$predictions, test$treat))
+    error <- sum(test$treat != pred.irri$predictions)/nrow(test)
+    TN <- tmp[tmp$Var1=="irr" & tmp$Var2=="irr","Freq"]
+    TP <- tmp[tmp$Var1=="non-irr" & tmp$Var2=="non-irr","Freq"]
+    FN <- tmp[tmp$Var1=="non-irr" & tmp$Var2=="irr","Freq"]
+    FP <- tmp[tmp$Var1=="irr" & tmp$Var2=="non-irr","Freq"]
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
-    res <- rbind(res, cbind(TP, TN, FP, FN, err_rate, sensitivity, precision))
+    res <- rbind(res, cbind(TP, TN, FP, FN, error, sensitivity, precision))
     importance[[i]] <- rg.irri$variable.importance
   }
   summary <- rbind(apply(res,2,mean),apply(res,2,sd))
