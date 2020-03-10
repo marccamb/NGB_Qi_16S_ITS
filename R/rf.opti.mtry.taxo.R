@@ -32,7 +32,7 @@ rf.opti.mtry.taxo <- function(tab, tax.table, treat,
     if(l=="ASV") {
       tab_agg <- tab
     } else {
-      tab_agg <- agg.table.taxo(tab, tax.lvl = l, taxo)
+      tab_agg <- agg.table.taxo(tab, tax.lvl = l, tax.table)
     }
 
     ## mtry for the given taxonomic level
