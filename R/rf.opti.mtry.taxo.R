@@ -46,6 +46,10 @@ rf.opti.mtry.taxo <- function(tab, tax.table, treat,
                                                 n.fold = rf.param,
                                                 n.tree = n.tree,
                                                 seed=seed)
+      if (cross.val == "blind") tmp <- rf.blind(tab_agg, treat, train.id = train.id,
+                                                mtry = function(x) n*x/n.mtry,
+                                                n.forest = rf.param,
+                                                n.tree = n.tree)
       res <- rbind(res, c(mtry[n],
                           tmp[["summary"]]["mean",],
                           tmp[["summary"]]["sd",]))

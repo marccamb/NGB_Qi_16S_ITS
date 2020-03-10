@@ -10,8 +10,6 @@
 #' See \code{ranger} documentation for details.
 #' @param n.tree The number of tree to grow. The default is \code{500}.
 #' @param n.forest The number of forests to grow. The default is \code{100}.
-#' @param seed A number to set seed before sampling samples in the n-folding process
-#' and before growing each forest. The default is \code{NA}.
 #'
 #'
 #' @return Returns a list object containing the confusion matrix, the error rate, the sensitivity

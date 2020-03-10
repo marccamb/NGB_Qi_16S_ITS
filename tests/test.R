@@ -143,3 +143,37 @@ legend("topleft", pch=c(0,1,2,15,16,17), col=1,bty = "n",
 legend("left", pch=16, col=hue_div_5[1:length(d)],bty = "n",
        legend=names(d),
        cex = 0.7)
+
+
+
+
+
+res <- rf.opti.mtry.taxo(tab, treat = z$irrigation, tax.table = assign_16S_ITS,
+                         cross.val = "blind",
+                         train.id="-M-")
+
+par(mfrow=c(1,1), bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
+plot(c(0.6,1), c(0.6,1), type="n", xlab="Mean precision", ylab="Mean sensitivity")
+d <- res
+for (i in 1:length(d)) {
+  points(sensitivity_mean~precision_mean,
+         pch=c(0,1,2,15,16,17)[i],
+         col=adjustcolor("lightgray", alpha.f = 0.3),
+         data=d[[i]][-which.min(d[[i]][,"error_mean"]),])
+}
+for (i in 1:length(d)) {
+  with(data.frame(d[[i]])[which.min(d[[i]][,"error_mean"]),],
+       segments(precision_mean-precision_sd, sensitivity_mean,
+                precision_mean+precision_sd, sensitivity_mean,
+                col=adjustcolor("gray", alpha.f = 0.4))
+  )
+  with(data.frame(d[[i]])[which.min(d[[i]][,"error_mean"]),],
+       segments(precision_mean, sensitivity_mean-sensitivity_sd,
+                precision_mean, sensitivity_mean+sensitivity_sd,
+                col=adjustcolor("gray", alpha.f = 0.4))
+  )
+  points(sensitivity_mean~precision_mean, cex=2,
+         pch=c(22,21,24,15,16,17)[i], bg="white",
+         col=c(1:5)[i],
+         data=data.frame(d[[i]])[which.min(d[[i]][,"error_mean"]),])
+}

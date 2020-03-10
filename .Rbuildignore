@@ -1,2 +1,4 @@
 ^optiranger\.Rproj$
 ^\.Rproj\.user$
+^optiranger.Rproj$
+^tests/test.R$

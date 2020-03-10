@@ -19,9 +19,6 @@ See \code{ranger} documentation for details.}
 \item{n.tree}{The number of tree to grow. The default is \code{500}.}
 
 \item{n.forest}{The number of forests to grow. The default is \code{100}.}
-
-\item{seed}{A number to set seed before sampling samples in the n-folding process
-and before growing each forest. The default is \code{NA}.}
 }
 \value{
 Returns a list object containing the confusion matrix, the error rate, the sensitivity
