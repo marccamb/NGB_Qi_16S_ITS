@@ -4,20 +4,20 @@
 \alias{rf.nfold}
 \title{k-fold cross validation for random forest}
 \usage{
-rf.nfold(tab, treat, n_fold = 5, mtry = NULL, seed = 1409)
+rf.nfold(tab, treat, n.fold = 5, mtry = NULL, n.tree = 500, seed = NA)
 }
 \arguments{
 \item{tab}{An abundance table containing samples in columns and OTUs/ASV in rows.}
 
 \item{treat}{A vector containing the class identity of each sample.}
 
-\item{n_fold}{A number of fold to be applied for n-fold cross-valisation.}
+\item{n.fold}{A number of fold to be applied for n-fold cross-valisation.}
 
 \item{mtry}{The mtry parameter to be passed to the \code{ranger} function. See \code{ranger} documentation for details.}
 
-\item{seed}{A number to set the seed before before growing each forest. The default is \code{NA}.}
+\item{n.tree}{The number of tree to grow. The default is \code{500}.}
 
-\item{n_tree}{The number of tree to grow. The default is \code{500}.}
+\item{seed}{A number to set the seed before before growing each forest. The default is \code{NA}.}
 }
 \value{
 A list...
