@@ -75,7 +75,7 @@ rm(tmp_16S, tmp_ITS)
 tab <- asv_table_16S_ITS
 z <- samples_16S_ITS
 
-res <- rf.nfold(tab, treat=z$irrigation, n_fold = 5, mtry=540, seed = 1409)
+res <- rf.nfold(tab, treat=z$irrigation, n.fold = 5, mtry=540, seed = 1409)
 toto <-res
 par(mfrow=c(2,3), mar=c(3,7,3,0), col.axis="black")
 for (i in 1:length(toto$importance)) {
@@ -87,7 +87,20 @@ for (i in 1:length(toto$importance)) {
 }
 
 
-res <- rf.blind(tab, treat = z$irrigation, train.id = "-M-")
+res <- rf.blind(tab, treat = z$irrigation, train.id = "-M-", n.forest = 10)
 names(res)
 length(res$importance)
 res$confusion
+toto <-res
+par(mfrow=c(2,3), mar=c(3,7,3,0), col.axis="black")
+for (i in 1:length(toto$importance)) {
+  barplot(sort(toto$importance[[i]], decreasing = T)[1:20],
+          main=paste("n-fold", i),
+          cex.names=1, cex.axis = 1.5,
+          horiz = T,las=1, border=NA,
+          xlab = "Gini index")
+}
+
+
+res <- rf.opti.mtry.taxo(tab, treat = z$irrigation, tax.table = assign_16S_ITS)
+
