@@ -11,7 +11,6 @@
 #'
 #'
 #' @return A list...
-#' @import ranger
 
 # 2020-02-27
 # Marine C. Cambon
@@ -27,7 +26,7 @@ rf.nfold <- function(tab, treat,
   train.idx <- sample(rep(1:n.fold, 1/n.fold * ncol(tab)), replace = F)
   tab_agg <- data.frame("treat" = treat, t(tab))
 
-  res <- data.frame()
+  res <- NULL
   importance <- list()
   err_mean <- err_sd <- NULL
   TP_mean <- TN_mean <- FP_mean <- FN_mean <- NULL
@@ -58,11 +57,13 @@ rf.nfold <- function(tab, treat,
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
     res <- rbind(res,c(TN,TP,FN,FP,error,sensitivity,precision))
-    importance[[i]] <- pred.irri$importance
+    importance[[i]] <- ranger::importance(rg)
   }
-  rownames(res) <- names(importance) <- paste("nfold_", 1:n.fold,sep="")
-  summary <- data.frame(apply(res,2,mean))
-  summary <- rbind(summary, apply(res,2,sd))
+  colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
+  rownames(res) <- paste("nfold_", 1:n.fold,sep="")
+  names(importance) <- paste("nfold_", 1:n.fold,sep="")
+
+  summary <- rbind(apply(res,2,mean),apply(res,2,sd))
   rownames(summary) <- c("mean", "sd")
 
   res_tot <- list(summary, res, importance)
