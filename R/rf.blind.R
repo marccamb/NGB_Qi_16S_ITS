@@ -55,7 +55,10 @@ rf.blind <- function(tab, treat,
     res <- rbind(res, cbind(TP, TN, FP, FN, err_rate, sensitivity, precision))
     importance[[i]] <- rg.irri$variable.importance
   }
-  res_tot <- list(res, importance)
-  names(res_tot) <- c("confusion", "importance")
+  summary <- rbind(apply(res,2,mean),apply(res,2,sd))
+  rownames(summary) <- c("mean", "sd")
+
+  res_tot <- list(summary, res, importance)
+  names(res_tot) <- c("summary", "confusion", "importance")
   return(res_tot)
 }
