@@ -1,5 +1,5 @@
 Package: optiranger
-Title: What the Package Does (One Line, Title Case)
+Title: Optimisation of random forest on micrbial community data
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Marine C.",
@@ -8,7 +8,7 @@ Authors@R:
            email = "cambonmarine@gmail.com",
            comment = c(ORCID = "https://orcid.org/0000-0001-5234-4196"))
 Description: What the package does (one paragraph).
-License: What license it uses
+License: FALSE
 Encoding: UTF-8
 LazyData: true
 Imports: ranger

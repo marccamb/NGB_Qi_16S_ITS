@@ -74,6 +74,7 @@ rm(tmp_16S, tmp_ITS)
 
 tab <- asv_table_16S_ITS
 z <- samples_16S_ITS
+
 res <- rf.nfold(tab, treat=z$irrigation, n_fold = 5, mtry=540, seed = 1409)
 toto <-res
 par(mfrow=c(2,3), mar=c(3,7,3,0), col.axis="black")
@@ -84,3 +85,9 @@ for (i in 1:length(toto$importance)) {
           horiz = T,las=1, border=NA,
           xlab = "Gini index")
 }
+
+
+res <- rf.blind(tab, treat = z$irrigation, train.id = "-M-")
+names(res)
+length(res$importance)
+res$confusion
