@@ -101,9 +101,20 @@ for (i in 1:length(toto$importance)) {
           xlab = "Gini index")
 }
 
-
-res <- rf.opti.mtry.taxo(tab, treat = z$irrigation, tax.table = assign_16S_ITS)
-
+tab <- asv_table_16S[apply(asv_table_16S, 1, sum)>0.001*sum(asv_table_16S),]
+taxo <- assign_16S[rownames(tab),]
+z <- samples_16S
+res_tot <- rf.opti.mtry.taxo(tab = tab,
+                             tax.table = taxo,
+                             n.mtry = 20,
+                             treat = z$irrigation,
+                             cross.val = "nfold",
+                             n.tree = 500,
+                             seed = 1409, rf.param = 5)
+tab_agg <- agg.table.taxo(tab,tax.lvl = "family", tax.table = taxo)
+dim(tab_agg)
+if (n.mtry+1>nrow(tab_agg)) n.mtry <- nrow(tab_agg)-1
+mtry <- 1:n.mtry*(ncol(tab_agg)-1)/n.mtry
 par(mfrow=c(1,1), bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
 plot(c(0.6,1), c(0.6,1), type="n", xlab="Mean precision", ylab="Mean sensitivity")
 d <- res

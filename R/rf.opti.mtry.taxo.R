@@ -42,7 +42,7 @@ rf.opti.mtry.taxo <- function(tab, tax.table, treat,
     }
 
     ## mtry for the given taxonomic level
-    if (n.mtry+1>ncol(tab_agg)) n.mtry <- ncol(tab_agg)-1
+    if (n.mtry+1>nrow(tab_agg)) n.mtry <- nrow(tab_agg)-1
     mtry <- 1:n.mtry*(ncol(tab_agg)-1)/n.mtry
 
     res <- NULL
