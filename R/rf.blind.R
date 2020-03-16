@@ -17,6 +17,7 @@
 #' forests.
 #'
 #' @import ranger
+#' @export rf.blind
 
 # 2020-02-27
 # Marine C. Cambon

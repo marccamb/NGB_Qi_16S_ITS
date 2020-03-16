@@ -13,6 +13,7 @@
 #' @return A list...
 #'
 #' @import ranger
+#' @export rf.nfold
 
 # 2020-02-27
 # Marine C. Cambon

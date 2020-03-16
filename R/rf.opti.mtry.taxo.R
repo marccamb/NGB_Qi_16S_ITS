@@ -1,7 +1,13 @@
+#'Random forest optimization
+#'Runs random forest classification with several taxonomic level and mtry parameters and performs
+#'k-fold or blind cross-validation
+#'
+#' @import ranger
+#' @export rf.opti.mtry.taxo
 # Funtion rf.mtry.taxo()
-# runs random forest classification with several
-#  taxonomic level and mtry parameters and returns
-#  error rate obtained by n-foldinf cross-validation
+#
+#
+#
 #
 # 2020-02-27
 # Marine C. Cambon
