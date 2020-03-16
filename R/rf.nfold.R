@@ -9,7 +9,6 @@
 #' @param n.tree The number of tree to grow. The default is \code{500}.
 #' @param seed A number to set the seed before before growing each forest. The default is \code{NA}.
 #'
-#'
 #' @return A list...
 #'
 #' @import ranger

@@ -2,9 +2,7 @@
 % Please edit documentation in R/rf.opti.mtry.taxo.R
 \name{rf.opti.mtry.taxo}
 \alias{rf.opti.mtry.taxo}
-\title{Random forest optimization
-Runs random forest classification with several taxonomic level and mtry parameters and performs
-k-fold or blind cross-validation}
+\title{Random forest optimization}
 \usage{
 rf.opti.mtry.taxo(
   tab,
@@ -14,12 +12,38 @@ rf.opti.mtry.taxo(
   cross.val = "nfold",
   train.id = NA,
   n.tree = 100,
-  rf.param = 5,
+  cross.param = 5,
   seed = 1409
 )
 }
+\arguments{
+\item{tab}{An abundance table containing samples in columns and OTUs/ASV in rows.}
+
+\item{tax.table}{A table containing the taxonomy of each ASV/OTU.}
+
+\item{treat}{A vector containing the class identity of each sample.}
+
+\item{n.mtry}{The number of mtry parameters to be tested. mtry values are then calculated as
+\code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.}
+
+\item{cross.val}{The type of cross validation to perform. Possible values are "blind" or
+"nfold" (Default).}
+
+\item{train.id}{A string that matches the name of samples tu be used for training. Only
+meaningful for \code{cass.val = "blind"}.}
+
+\item{n.tree}{The number of tree to grow for each forest. Default is 100.}
+
+\item{cross.param}{The parameter needed for cross validation: the number of folds for
+\code{cross.val = "nfold"} or the number of forests to grow for \code{cross.val = "blind"}. Default is 5.}
+
+\item{seed}{The seed to set before growing each forest, and before sampling of training dataset in
+\code{cross.val = "nfold"}. Set to NA for no seeding. Default is \code{1409}.}
+}
+\value{
+Return....
+}
 \description{
-Random forest optimization
 Runs random forest classification with several taxonomic level and mtry parameters and performs
-k-fold or blind cross-validation
+k-fold or blind cross-validation.
 }
