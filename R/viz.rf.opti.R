@@ -1,7 +1,28 @@
+#' Visualization of random forest optimization
+#'
+#' Visualization of the results obtained via \code{\link{rf.opti.mtry.taxo}}. Plot the mean (+/- sd) sensitivity
+#'  and mean (+/- sd) precision of each models obtained for each set of parameters and/or dataset
+#'
+#' @param foo A vector of full names (including their path) of RDS files containing outputs of
+#' the function \code{\link{rf.opti.mtry.taxo}}.
+#' @param xlim A vector of lenght two giving the range of the x-axis. Dafault is c(0,1).
+#' @param ylim A vector of lenght two giving the range of the y-axis. Dafault is c(0,1).
+#' @param pch A vector of the same lenght as foo containing pch for plotting. Default is c(22,21,24,15,16,17).
+#' @param hue A vector containing colors for each taxnonomic levels. Default is a diverging color
+#'   palette of length 5.
+#' @param default.legend Whether to display the default legend. Plotting your own legend is
+#'   recommended. Default = F.
+#' @param pdf.output Whether to save the plot in a pdf file. Default = F.
+#' @param filename The filename and path where to save the pdf plot (only meaningful when pdf.output = T)
+#'
+#' @return Returns ....
+#'
+#' @export viz.rf.opti
+#' @importFrom grDevices dev.off adjustcolor pdf
+#' @importFrom graphics legend par plot points segments
+#'
 
-
-
-plot.rf.opti <- function(foo, xlim = NULL, ylim = NULL, pch=c(22,21,24,15,16,17),
+viz.rf.opti <- function(foo, xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,17),
                          hue=c("#9a394e","#d68157","#f3d577","#84b368","#00876c"),
                          default.legend = F,
                          pdf.output = F, filename = NULL) {
@@ -12,8 +33,7 @@ plot.rf.opti <- function(foo, xlim = NULL, ylim = NULL, pch=c(22,21,24,15,16,17)
   par(mfrow=c(1,1), bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
 
   # Drawing an empty plot
-  plot(if (is.null(xlim)) c(0,1) else xlim,
-       if (is.null(ylim)) c(0,1) else ylim,
+  plot(xlim, ylim,
        type="n", xlab="Mean precision", ylab="Mean sensitivity")
   res_err_rate <- res_err_rate_sd <- NULL
 

@@ -10,7 +10,7 @@ Authors@R:
 Description: What the package does (one paragraph).
 URL: https://github.com/marccamb/optiranger
 BugReports: https://github.com/marccamb/optiranger/issues
-License: FALSE
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Imports: ranger
