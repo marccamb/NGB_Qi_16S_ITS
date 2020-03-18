@@ -34,8 +34,8 @@ rf.blind <- function(tab, treat,
   pred.irri <- error <- rate <- NULL
   res <- data.frame()
   importance <- list()
+  message("Growing ", n.forest, " forests...")
   for (i in 1:n.forest) {
-    message("Growing forest number ", i, "...")
     #set.seed(seed)
     rg.irri <- ranger::ranger(treat ~ ., data = train,
                       num.trees = n.tree,
@@ -54,6 +54,7 @@ rf.blind <- function(tab, treat,
     res <- rbind(res, cbind(TP, TN, FP, FN, error, sensitivity, precision))
     importance[[i]] <- rg.irri$variable.importance
   }
+  message("Done!")
   summary <- rbind(apply(res,2,mean),apply(res,2,sd))
   rownames(summary) <- c("mean", "sd")
 
