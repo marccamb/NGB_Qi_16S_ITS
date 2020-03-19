@@ -31,7 +31,7 @@ rf.blind <- function(tab, treat,
   tab <- data.frame("treat" = treat, t(tab))
   train <- tab[train.idx, ]
   test <- tab[-train.idx, ]
-  pred.irri <- error <- rate <- NULL
+  #pred.irri <- error <- rate <- NULL
   res <- data.frame()
   importance <- list()
   message("Growing ", n.forest, " forests...")
@@ -51,7 +51,7 @@ rf.blind <- function(tab, treat,
     FP <- tmp[tmp$Var1=="irr" & tmp$Var2=="non-irr","Freq"]
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
-    res <- rbind(res, cbind(TP, TN, FP, FN, error, sensitivity, precision))
+    res <- rbind(res, c(TP, TN, FP, FN, error, sensitivity, precision))
     importance[[i]] <- rg.irri$variable.importance
   }
   message("Done!")
