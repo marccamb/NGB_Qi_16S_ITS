@@ -10,7 +10,8 @@
 #' See \code{ranger} documentation for details.
 #' @param n.tree The number of tree to grow. The default is \code{500}.
 #' @param n.forest The number of forests to grow. The default is \code{100}.
-#'
+#' @param seed A number to set the seed before growing the forest. Only meaningful
+#' if n.forest == 1. The default is \code{NULL}.
 #'
 #' @return Returns a list object containing the confusion matrix, the error rate, the sensitivity
 #' the precision as well as the variable importance obtained for each of the \code{n.forest} grown
@@ -26,7 +27,8 @@ rf.blind <- function(tab, treat,
                      train.id = NA,
                      mtry = NULL,
                      n.tree = 500,
-                     n.forest = 100) {
+                     n.forest = 100,
+                     seed=NULL) {
   train.idx <- grep(train.id, colnames(tab))
   tab <- data.frame("treat" = treat, t(tab))
   train <- tab[train.idx, ]
@@ -36,7 +38,7 @@ rf.blind <- function(tab, treat,
   importance <- list()
   message("Growing ", n.forest, " forests...")
   for (i in 1:n.forest) {
-    #set.seed(seed)
+    if(n.forest == 1) set.seed(seed)
     rg.irri <- ranger::ranger(treat ~ ., data = train,
                       num.trees = n.tree,
                       mtry = mtry,

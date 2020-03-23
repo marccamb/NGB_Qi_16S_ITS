@@ -7,7 +7,7 @@
 #' @param n.fold A number of fold to be applied for n-fold cross-valisation.
 #' @param mtry The mtry parameter to be passed to the \code{ranger} function. See \code{ranger} documentation for details.
 #' @param n.tree The number of tree to grow. The default is \code{500}.
-#' @param seed A number to set the seed before before growing each forest. The default is \code{NA}.
+#' @param seed A number to set the seed before before growing each forest. The default is \code{NULL}.
 #'
 #' @return A list...
 #'
@@ -22,7 +22,7 @@ rf.nfold <- function(tab, treat,
                      n.fold = 5,
                      mtry = NULL,
                      n.tree = 500,
-                     seed = NA) {
+                     seed = NULL) {
   # Preparing training IDs and dataframe
   if (!is.na(seed)) set.seed(seed)
   train.idx <- sample(rep(1:n.fold, 1/n.fold * ncol(tab)), replace = F)
