@@ -54,6 +54,7 @@ rf.blind <- function(tab, treat,
     res <- rbind(res, c(TP, TN, FP, FN, error, sensitivity, precision))
     importance[[i]] <- rg.irri$variable.importance
   }
+  colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
   message("Done!")
   summary <- rbind(apply(res,2,mean),apply(res,2,sd))
   rownames(summary) <- c("mean", "sd")
