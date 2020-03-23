@@ -15,7 +15,8 @@
 #' @param pdf.output Whether to save the plot in a pdf file. Default = F.
 #' @param filename The filename and path where to save the pdf plot (only meaningful when pdf.output = T)
 #'
-#' @return Returns ....
+#' @return Returns the minimum mean error rate (and sd) obtained and the name of the corresponding RDS file and
+#' taxonomic level
 #'
 #' @export viz.rf.opti
 #' @importFrom grDevices dev.off adjustcolor pdf
@@ -35,7 +36,6 @@ viz.rf.opti <- function(foo, xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,
   # Drawing an empty plot
   plot(xlim, ylim,
        type="n", xlab="Mean precision", ylab="Mean sensitivity")
-  res_err_rate <- res_err_rate_sd <- NULL
 
   err <- mapply(function(files, points.type) {
     d <- readRDS(files)
@@ -87,5 +87,14 @@ viz.rf.opti <- function(foo, xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,
          cex = 0.7)
   }
   if (pdf.output) dev.off()
-  return(err)
+
+  # dirty way to extract the best model:
+  n <- paste(rep(colnames(err), each=10),
+             rep(c("ASV", "genus", "family",
+                   "order", "class"), each=2))
+  res_err <- as.data.frame(cbind(n, unlist(err)))
+  res_err[,2] <- as.numeric(as.character(res_err[,2]))
+  rowmin <- which(res_err[,2] == min(res_err[grep("mean", rownames(res_err)),2]))
+  res_err <- res_err[c(rowmin, rowmin + 1),]
+  return(res_err)
 }

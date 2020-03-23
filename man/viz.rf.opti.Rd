@@ -36,7 +36,8 @@ recommended. Default = F.}
 \item{filename}{The filename and path where to save the pdf plot (only meaningful when pdf.output = T)}
 }
 \value{
-Returns ....
+Returns the minimum mean error rate (and sd) obtained and the name of the corresponding RDS file and
+taxonomic level
 }
 \description{
 Visualization of the results obtained via \code{\link{rf.opti.mtry.taxo}}. Plot the mean (+/- sd) sensitivity
