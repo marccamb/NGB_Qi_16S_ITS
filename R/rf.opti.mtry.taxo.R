@@ -50,7 +50,6 @@ message("Ranger optimization starting without taxonomic aggregation of the data.
       n.mtry <- nrow(tab_agg)-1
       message("n.mtry is higher than the number of ", l, " in the dataset, and have been set to ", n.mtry)
     }
-    mtry <- 1:n.mtry*(ncol(tab_agg)-1)/n.mtry
 
     res <- NULL
     for (n in 1:n.mtry) {
@@ -63,7 +62,7 @@ message("Ranger optimization starting without taxonomic aggregation of the data.
                                                 mtry = function(x) n*x/n.mtry,
                                                 n.forest = cross.param,
                                                 n.tree = n.tree)
-      res <- rbind(res, c(mtry[n],
+      res <- rbind(res, c(n*ncol(tab_agg)/n.mtry,
                           tmp[["summary"]]["mean",],
                           tmp[["summary"]]["sd",]))
     }
