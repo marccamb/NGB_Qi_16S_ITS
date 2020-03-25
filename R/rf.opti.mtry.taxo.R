@@ -62,7 +62,7 @@ message("Ranger optimization starting without taxonomic aggregation of the data.
                                                 mtry = function(x) n*x/n.mtry,
                                                 n.forest = cross.param,
                                                 n.tree = n.tree)
-      res <- rbind(res, c(n*ncol(tab_agg)/n.mtry,
+      res <- rbind(res, c(n*nrow(tab_agg)-1/n.mtry,
                           tmp[["summary"]]["mean",],
                           tmp[["summary"]]["sd",]))
     }
