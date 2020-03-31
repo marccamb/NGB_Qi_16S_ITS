@@ -74,3 +74,6 @@ message("Ranger optimization starting without taxonomic aggregation of the data.
   return(res_tot)
 }
 
+#### To do next:
+### Blind validation is actually called non-random cross-validation
+####
