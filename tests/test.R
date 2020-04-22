@@ -167,4 +167,7 @@ res <- rf.opti.mtry.taxo(tab, treat = z$irrigation, tax.table = assign_16S_ITS,
 
 foo <- list.files(pattern = "rf_irr.*_mtry_20_nfold_5_taxo_(16S|ITS).*\\.RDS", full.names = T,
                   path = "~/Documents/Postdoc_Biogeco/1_NGB/exploratory/Qi/NGB_Qi_16S_ITS_analysis_v2")
-err <- plot.rf.opti(foo, xlim=c(0.6,1), ylim=c(0.6,1), default.legend = T)
+
+foo <- readRDS(foo[1])
+
+err <- viz.rf.opti(foo, xlim=c(0.6,1), ylim=c(0.6,1), default.legend = T)
