@@ -3,7 +3,7 @@
 #' Visualization of the results obtained via \code{\link{rf.opti.mtry.taxo}}. Plot the mean (+/- sd) sensitivity
 #'  and mean (+/- sd) precision of each models obtained for each set of parameters and/or dataset
 #'
-#' @param foo A vector of full names (including their path) of RDS files containing outputs of
+#' @param foo The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively, a vector of full names (including their path) of RDS files containing outputs of
 #' the function \code{\link{rf.opti.mtry.taxo}}.
 #' @param xlim A vector of lenght two giving the range of the x-axis. Dafault is c(0,1).
 #' @param ylim A vector of lenght two giving the range of the y-axis. Dafault is c(0,1).
@@ -23,11 +23,20 @@
 #' @importFrom graphics legend par plot points segments
 #'
 
-viz.rf.opti <- function(foo, xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,17),
-                         hue=c("#9a394e","#d68157","#f3d577","#84b368","#00876c"),
-                         default.legend = F,
-                         pdf.output = F, filename = NULL) {
-  if (length(foo) != length(pch)) warning("The pch vector and the file vector do not have the same lenght.")
+viz.rf.opti <- function(foo,
+                        xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,17),
+                        hue=c("#9a394e","#d68157","#f3d577","#84b368","#00876c"),
+                        default.legend = F,
+                        pdf.output = F, filename = NULL) {
+  # Check if foo contains RDS file names
+  RDSfiles = F
+  if (class(foo)!="list") {
+    if (length(grep("\\.RDS", foo)) != length(foo)) {
+    stop("foo should contain names of RDS files. Check the RDS extension of your files.")
+    } else {
+      RDSfiles = T
+    }
+  }
 
   if (pdf.output) pdf(filename, 5, 5)
   # Setting plot parameters
@@ -37,11 +46,59 @@ viz.rf.opti <- function(foo, xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,
   plot(xlim, ylim,
        type="n", xlab="Mean precision", ylab="Mean sensitivity")
 
-  err <- mapply(function(files, points.type) {
-    d <- readRDS(files)
+  # plot with multiple RDS files
+  if (RDSfiles) {
+    if (length(foo) != length(pch)) warning("The pch vector and the file vector do not have the same lenght.")
+    err <- mapply(function(files, points.type) {
+      d <- readRDS(files)
+      err <- mapply(function(x, col) {
+        points(sensitivity_mean~precision_mean,
+               pch=points.type,
+               col=adjustcolor("lightgray", alpha.f = 0.3),
+               data=x[-which.min(x[,"error_mean"]),])
+
+        x.min <- x[which.min(x[,"error_mean"]),]
+        segments(x.min["precision_mean"] - x.min["precision_sd"],
+                 x.min["sensitivity_mean"],
+                 x.min["precision_mean"] + x.min["precision_sd"],
+                 x.min["sensitivity_mean"],
+                 col=adjustcolor("gray", alpha.f = 0.4))
+
+        segments(x.min["precision_mean"],
+                 x.min["sensitivity_mean"] - x.min["sensitivity_sd"],
+                 x.min["precision_mean"],
+                 x.min["sensitivity_mean"] + x.min["sensitivity_sd"],
+                 col=adjustcolor("gray", alpha.f = 0.4))
+        return(list("mean"=x.min["error_mean"], "sd"=x.min["error_sd"]))
+      }, d)
+    }, foo, pch)
+
+    # Points the minimum error rate for each taxo level and dataset
+    mapply(function(files, points.type) {
+      d <- readRDS(files) # This is not optimal, I read each RDS file two times!
+      mapply(function(x, col){
+        x.min <- x[which.min(x[,"error_mean"]),]
+        points(x.min["sensitivity_mean"]~x.min["precision_mean"], cex=2,
+               pch=points.type, bg="white",
+               col=col)
+      }, d, hue)
+    },foo, pch)
+    # dirty way to extract the best model:
+    n <- paste(rep(colnames(err), each=10),
+               rep(c("ASV", "genus", "family",
+                     "order", "class"), each=2))
+    res_err <- as.data.frame(cbind(n, unlist(err)))
+    res_err[,2] <- as.numeric(as.character(res_err[,2]))
+    rowmin <- which(res_err[,2] == min(res_err[grep("mean", rownames(res_err)),2]))
+    res_err <- res_err[c(rowmin, rowmin + 1),]
+  } else {
+# Plot with only one object from rf.opti.mtry.taxo
+    if (length(pch)>1) {
+      warning("There is only one object to plot. Only the first value of pch will be used.")
+      }
     err <- mapply(function(x, col) {
       points(sensitivity_mean~precision_mean,
-             pch=points.type,
+             pch=pch[1],
              col=adjustcolor("lightgray", alpha.f = 0.3),
              data=x[-which.min(x[,"error_mean"]),])
 
@@ -58,19 +115,18 @@ viz.rf.opti <- function(foo, xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,
                x.min["sensitivity_mean"] + x.min["sensitivity_sd"],
                col=adjustcolor("gray", alpha.f = 0.4))
       return(list("mean"=x.min["error_mean"], "sd"=x.min["error_sd"]))
-    }, d)
-  }, foo, pch)
+    }, foo)
 
-  # Points the minimum error rate for each taxo level and dataset
-  mapply(function(files, points.type) {
-    d <- readRDS(files)
+    # Points the minimum error rate for each taxo level
     mapply(function(x, col){
       x.min <- x[which.min(x[,"error_mean"]),]
       points(x.min["sensitivity_mean"]~x.min["precision_mean"], cex=2,
-             pch=points.type, bg="white",
+             pch=pch[1], bg="white",
              col=col)
-    }, d, hue)
-  },foo, pch)
+    }, foo, hue)
+    res_err <- err[,which.min(err["mean",])]
+    names(res_err) <- paste(names(res_err), colnames(err)[which.min(err["mean",])])
+  }
 
   if (default.legend) {
   legend("topleft", pch=pch, col=1, bty = "n",
@@ -88,13 +144,6 @@ viz.rf.opti <- function(foo, xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,
   }
   if (pdf.output) dev.off()
 
-  # dirty way to extract the best model:
-  n <- paste(rep(colnames(err), each=10),
-             rep(c("ASV", "genus", "family",
-                   "order", "class"), each=2))
-  res_err <- as.data.frame(cbind(n, unlist(err)))
-  res_err[,2] <- as.numeric(as.character(res_err[,2]))
-  rowmin <- which(res_err[,2] == min(res_err[grep("mean", rownames(res_err)),2]))
-  res_err <- res_err[c(rowmin, rowmin + 1),]
+
   return(res_err)
 }

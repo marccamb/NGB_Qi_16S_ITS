@@ -16,7 +16,7 @@ viz.rf.opti(
 )
 }
 \arguments{
-\item{foo}{A vector of full names (including their path) of RDS files containing outputs of
+\item{foo}{The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively, a vector of full names (including their path) of RDS files containing outputs of
 the function \code{\link{rf.opti.mtry.taxo}}.}
 
 \item{xlim}{A vector of lenght two giving the range of the x-axis. Dafault is c(0,1).}
