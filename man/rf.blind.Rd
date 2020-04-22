@@ -2,16 +2,26 @@
 % Please edit documentation in R/rf.blind.R
 \name{rf.blind}
 \alias{rf.blind}
-\title{Blind cross validation for random forest}
+\title{Non-random cross validation for random forest}
 \usage{
-rf.blind(tab, treat, train.id = NA, mtry = NULL, n.tree = 500, n.forest = 100)
+rf.blind(
+  tab,
+  treat,
+  train.id = NA,
+  mtry = NULL,
+  n.tree = 500,
+  n.forest = 100,
+  seed = NULL
+)
 }
 \arguments{
-\item{tab}{An abundance table containing samples in columns and OTUs/ASV in rows.}
+\item{tab}{An abundance or presence absence table containing samples in columns and OTUs/ASV in rows.}
 
-\item{treat}{A vector containing the class identity of each sample.}
+\item{treat}{A vector containing the class identity of each sample, i.e. the treatment to predict.}
 
-\item{train.id}{A charecter sting to be searched in samples names that will be used for training.}
+\item{train.id}{A charecter sting to be searched in samples names that will be used for training.
+Can be a regular expression. Can alernatively be a boolean vector saying wether or not each sample
+is part of the training dataset(TRUE for training samples, FALSE for testing samples).}
 
 \item{mtry}{The mtry parameter to be passed to the \code{ranger} function.
 See \code{ranger} documentation for details.}
@@ -19,6 +29,9 @@ See \code{ranger} documentation for details.}
 \item{n.tree}{The number of tree to grow. The default is \code{500}.}
 
 \item{n.forest}{The number of forests to grow. The default is \code{100}.}
+
+\item{seed}{A number to set the seed before growing the forest. Only meaningful
+if n.forest == 1. The default is \code{NULL}.}
 }
 \value{
 Returns a list object containing the confusion matrix, the error rate, the sensitivity
@@ -26,6 +39,6 @@ the precision as well as the variable importance obtained for each of the \code{
 forests.
 }
 \description{
-Grows multiple random forests with blind cross validation: the algorithm is trained
-a specific part of the dataset, and prediction are done on another part of the dataset.
+Grows multiple random forests with non-random cross validation: the algorithm is trained on
+a specific part of the dataset, and predictions are done on another part of the dataset.
 }

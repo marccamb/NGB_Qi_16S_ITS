@@ -4,7 +4,7 @@
 \alias{rf.nfold}
 \title{k-fold cross validation for random forest}
 \usage{
-rf.nfold(tab, treat, n.fold = 5, mtry = NULL, n.tree = 500, seed = NA)
+rf.nfold(tab, treat, n.fold = 5, mtry = NULL, n.tree = 500, seed = NULL)
 }
 \arguments{
 \item{tab}{An abundance table containing samples in columns and OTUs/ASV in rows.}
@@ -17,7 +17,7 @@ rf.nfold(tab, treat, n.fold = 5, mtry = NULL, n.tree = 500, seed = NA)
 
 \item{n.tree}{The number of tree to grow. The default is \code{500}.}
 
-\item{seed}{A number to set the seed before before growing each forest. The default is \code{NA}.}
+\item{seed}{A number to set the seed before before growing each forest. The default is \code{NULL}.}
 }
 \value{
 A list...
