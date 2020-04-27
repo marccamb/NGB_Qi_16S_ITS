@@ -18,7 +18,8 @@ The default is "genus".}
 }
 \value{
 An abundance table with the sum of counts for each ASV/OTU corresponding to
-a given taxonomic level, found in each sample.
+a given taxonomic level, found in each sample. ASV/OTUs that are not assigned at this
+specific level are discarded.
 }
 \description{
 Table aggregation according to taxonomy

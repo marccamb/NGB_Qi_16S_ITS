@@ -9,14 +9,16 @@
 #' @param n.mtry The number of mtry parameters to be tested. mtry values are then calculated as
 #' \code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.
 #' @param cross.val The type of cross validation to perform. Possible values are "blind" or
-#'  "nfold" (Default).
+#'  "kfold" (Default).
 #' @param train.id A string that matches the name of samples tu be used for training. Only
 #' meaningful for \code{cass.val = "blind"}.
 #' @param n.tree The number of tree to grow for each forest. Default is 100.
 #' @param cross.param The parameter needed for cross validation: the number of folds for
-#' \code{cross.val = "nfold"} or the number of forests to grow for \code{cross.val = "blind"}. Default is 5.
+#' \code{cross.val = "kfold"} or the number of forests to grow for \code{cross.val = "blind"}. Default is 5.
 #' @param seed The seed to set before growing each forest, and before sampling of training dataset in
-#' \code{cross.val = "nfold"}. Set to NA for no seeding. Default is \code{1409}.
+#' \code{cross.val = "kfold"}. Set to NA for no seeding. Default is \code{1409}.
+#' @param RDSfile A string contaning the name of the RDS file to save the results.
+#' Default is NULL and results are not saved.
 #'
 #'@return Return....
 #'
@@ -30,11 +32,12 @@ rf.opti.mtry.taxo <- function(tab,
                               tax.table,
                               treat,
                               n.mtry = 5,
-                              cross.val = "nfold",
+                              cross.val = "kfold",
                               train.id = NA,
                               n.tree = 100,
                               cross.param = 5,
-                              seed = 1409) {
+                              seed = 1409,
+                              RDSfile = NULL) {
 
 message("Ranger optimization starting without taxonomic aggregation of the data...")
   res_tot <- list()
@@ -53,9 +56,9 @@ message("Ranger optimization starting without taxonomic aggregation of the data.
 
     res <- NULL
     for (n in 1:n.mtry) {
-      if (cross.val == "nfold") tmp <- rf.nfold(tab_agg, treat,
+      if (cross.val == "kfold") tmp <- rf.kfold(tab_agg, treat,
                                                 mtry = function(x) n*x/n.mtry,
-                                                n.fold = cross.param,
+                                                k.fold = cross.param,
                                                 n.tree = n.tree,
                                                 seed=seed)
       if (cross.val == "blind") tmp <- rf.blind(tab_agg, treat, train.id = train.id,
@@ -71,6 +74,7 @@ message("Ranger optimization starting without taxonomic aggregation of the data.
 
     message(l, " lvl is done\n")
   }
+  if(!is.null(RDSfile)) saveRDS(res_tot, file = RDSfile)
   return(res_tot)
 }
 

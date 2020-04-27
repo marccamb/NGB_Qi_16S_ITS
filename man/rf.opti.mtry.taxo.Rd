@@ -9,11 +9,12 @@ rf.opti.mtry.taxo(
   tax.table,
   treat,
   n.mtry = 5,
-  cross.val = "nfold",
+  cross.val = "kfold",
   train.id = NA,
   n.tree = 100,
   cross.param = 5,
-  seed = 1409
+  seed = 1409,
+  RDSfile = NULL
 )
 }
 \arguments{
@@ -27,7 +28,7 @@ rf.opti.mtry.taxo(
 \code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.}
 
 \item{cross.val}{The type of cross validation to perform. Possible values are "blind" or
-"nfold" (Default).}
+"kfold" (Default).}
 
 \item{train.id}{A string that matches the name of samples tu be used for training. Only
 meaningful for \code{cass.val = "blind"}.}
@@ -35,10 +36,13 @@ meaningful for \code{cass.val = "blind"}.}
 \item{n.tree}{The number of tree to grow for each forest. Default is 100.}
 
 \item{cross.param}{The parameter needed for cross validation: the number of folds for
-\code{cross.val = "nfold"} or the number of forests to grow for \code{cross.val = "blind"}. Default is 5.}
+\code{cross.val = "kfold"} or the number of forests to grow for \code{cross.val = "blind"}. Default is 5.}
 
 \item{seed}{The seed to set before growing each forest, and before sampling of training dataset in
-\code{cross.val = "nfold"}. Set to NA for no seeding. Default is \code{1409}.}
+\code{cross.val = "kfold"}. Set to NA for no seeding. Default is \code{1409}.}
+
+\item{RDSfile}{A string contaning the name of the RDS file to save the results.
+Default is NULL and results are not saved.}
 }
 \value{
 Return....
