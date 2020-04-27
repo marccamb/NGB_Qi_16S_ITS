@@ -22,7 +22,8 @@ rf.opti.mtry.taxo(
 
 \item{tax.table}{A table containing the taxonomy of each ASV/OTU.}
 
-\item{treat}{A vector containing the class identity of each sample.}
+\item{treat}{A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
+This means that you should pick a class as a reference for the calculation of precision and sensitivity.}
 
 \item{n.mtry}{The number of mtry parameters to be tested. mtry values are then calculated as
 \code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.}
@@ -31,7 +32,7 @@ rf.opti.mtry.taxo(
 "kfold" (Default).}
 
 \item{train.id}{A string that matches the name of samples tu be used for training. Only
-meaningful for \code{cass.val = "blind"}.}
+meaningful for \code{cross.val = "blind"}.}
 
 \item{n.tree}{The number of tree to grow for each forest. Default is 100.}
 

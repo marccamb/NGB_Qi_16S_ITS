@@ -17,7 +17,8 @@ rf.blind(
 \arguments{
 \item{tab}{An abundance or presence absence table containing samples in columns and OTUs/ASV in rows.}
 
-\item{treat}{A vector containing the class identity of each sample, i.e. the treatment to predict.}
+\item{treat}{A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
+This means that you should pick a class as a reference for the calculation of precision and sensitivity.}
 
 \item{train.id}{A charecter sting to be searched in samples names that will be used for training.
 Can be a regular expression. Can alernatively be a boolean vector saying wether or not each sample

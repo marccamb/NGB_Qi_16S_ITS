@@ -4,7 +4,8 @@
 #' of the \code{k} parts of the dataset to make predictions, while the other \code{k-1} parts are used for the training.
 #'
 #' @param tab An abundance table containing samples in columns and OTUs/ASV in rows.
-#' @param treat A vector containing the class identity of each sample.
+#' @param treat A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
+#' This means that you should pick a class as a reference for the calculation of precision and sensitivity.
 #' @param k.fold A number of fold to be applied for k-fold cross-valisation.
 #' @param mtry The mtry parameter to be passed to the \code{ranger} function. See \code{ranger} documentation for details.
 #' @param n.tree The number of tree to grow in each of the \code{k} forests. The default is \code{500}.
@@ -35,6 +36,8 @@ rf.kfold <- function(tab, treat,
                      mtry = NULL,
                      n.tree = 500,
                      seed = NULL) {
+  if(any(!treat %in% c("TRUE", "FALSE"))) stop("treat is not a boolean vector")
+  treat <- ifelse(treat, "positive", "negative")
   # Preparing training IDs and dataframe
   if (!is.na(seed)) set.seed(seed)
   train.idx <- sample(rep(1:k.fold, 1/k.fold * ncol(tab)), replace = F)
@@ -63,11 +66,11 @@ rf.kfold <- function(tab, treat,
 
     # Store the variables
     tmp <- data.frame(table(pred$predictions, test$treat))
-    TN <- tmp[tmp$Var1=="irr" & tmp$Var2=="irr","Freq"]
-    TP <- tmp[tmp$Var1=="non-irr" & tmp$Var2=="non-irr","Freq"]
-    FN <- tmp[tmp$Var1=="non-irr" & tmp$Var2=="irr","Freq"]
-    FP <- tmp[tmp$Var1=="irr" & tmp$Var2=="non-irr","Freq"]
-    error <- (FP+FN)/(FP+FN+TP+TN)
+    TN <- tmp[tmp$Var1=="negative" & tmp$Var2=="negative","Freq"]
+    TP <- tmp[tmp$Var1=="positive" & tmp$Var2=="positive","Freq"]
+    FN <- tmp[tmp$Var1=="positive" & tmp$Var2=="negative","Freq"]
+    FP <- tmp[tmp$Var1=="negative" & tmp$Var2=="positive","Freq"]
+    error <- sum(test$treat != pred$predictions)/nrow(test)
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
     res <- rbind(res,c(TN,TP,FN,FP,error,sensitivity,precision))

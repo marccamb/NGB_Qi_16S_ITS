@@ -5,13 +5,14 @@
 #'
 #' @param tab An abundance table containing samples in columns and OTUs/ASV in rows.
 #' @param tax.table A table containing the taxonomy of each ASV/OTU.
-#' @param treat A vector containing the class identity of each sample.
+#' @param treat A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
+#' This means that you should pick a class as a reference for the calculation of precision and sensitivity.
 #' @param n.mtry The number of mtry parameters to be tested. mtry values are then calculated as
 #' \code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.
 #' @param cross.val The type of cross validation to perform. Possible values are "blind" or
 #'  "kfold" (Default).
 #' @param train.id A string that matches the name of samples tu be used for training. Only
-#' meaningful for \code{cass.val = "blind"}.
+#' meaningful for \code{cross.val = "blind"}.
 #' @param n.tree The number of tree to grow for each forest. Default is 100.
 #' @param cross.param The parameter needed for cross validation: the number of folds for
 #' \code{cross.val = "kfold"} or the number of forests to grow for \code{cross.val = "blind"}. Default is 5.

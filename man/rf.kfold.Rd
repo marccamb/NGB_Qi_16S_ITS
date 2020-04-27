@@ -9,7 +9,8 @@ rf.kfold(tab, treat, k.fold = 5, mtry = NULL, n.tree = 500, seed = NULL)
 \arguments{
 \item{tab}{An abundance table containing samples in columns and OTUs/ASV in rows.}
 
-\item{treat}{A vector containing the class identity of each sample.}
+\item{treat}{A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
+This means that you should pick a class as a reference for the calculation of precision and sensitivity.}
 
 \item{k.fold}{A number of fold to be applied for k-fold cross-valisation.}
 

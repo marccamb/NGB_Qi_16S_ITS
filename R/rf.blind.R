@@ -4,7 +4,8 @@
 #' a specific part of the dataset, and predictions are done on another part of the dataset.
 #'
 #' @param tab An abundance or presence absence table containing samples in columns and OTUs/ASV in rows.
-#' @param treat A vector containing the class identity of each sample, i.e. the treatment to predict.
+#' @param treat A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
+#' This means that you should pick a class as a reference for the calculation of precision and sensitivity.
 #' @param train.id A charecter sting to be searched in samples names that will be used for training.
 #' Can be a regular expression. Can alernatively be a boolean vector saying wether or not each sample
 #' is part of the training dataset(TRUE for training samples, FALSE for testing samples).
@@ -31,32 +32,34 @@ rf.blind <- function(tab, treat,
                      n.tree = 500,
                      n.forest = 100,
                      seed=NULL) {
+  if(any(!treat %in% c("TRUE", "FALSE"))) stop("treat is not a boolean vector")
+  treat <- ifelse(treat, "positive", "negative")
+
   train.idx <- grep(train.id, colnames(tab))
   tab <- data.frame("treat" = treat, t(tab))
   train <- tab[train.idx, ]
   test <- tab[-train.idx, ]
-  #pred.irri <- error <- rate <- NULL
   res <- data.frame()
   importance <- list()
   message("Growing ", n.forest, " forests...")
   for (i in 1:n.forest) {
     if(n.forest == 1) set.seed(seed)
-    rg.irri <- ranger::ranger(treat ~ ., data = train,
+    rg <- ranger::ranger(treat ~ ., data = train,
                       num.trees = n.tree,
                       mtry = mtry,
                       importance = "impurity")
 
-    pred.irri <- stats::predict(rg.irri, data = test)
-    tmp <- data.frame(table(pred.irri$predictions, test$treat))
-    error <- sum(test$treat != pred.irri$predictions)/nrow(test)
-    TN <- tmp[tmp$Var1=="irr" & tmp$Var2=="irr","Freq"]
-    TP <- tmp[tmp$Var1=="non-irr" & tmp$Var2=="non-irr","Freq"]
-    FN <- tmp[tmp$Var1=="non-irr" & tmp$Var2=="irr","Freq"]
-    FP <- tmp[tmp$Var1=="irr" & tmp$Var2=="non-irr","Freq"]
+    pred <- stats::predict(rg, data = test)
+    tmp <- data.frame(table(pred$predictions, test$treat))
+    TN <- tmp[tmp$Var1=="negative" & tmp$Var2=="negative","Freq"]
+    TP <- tmp[tmp$Var1=="positive" & tmp$Var2=="positive","Freq"]
+    FN <- tmp[tmp$Var1=="positive" & tmp$Var2=="negative","Freq"]
+    FP <- tmp[tmp$Var1=="negative" & tmp$Var2=="positive","Freq"]
+    error <- sum(test$treat != pred$predictions)/nrow(test)
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
     res <- rbind(res, c(TP, TN, FP, FN, error, sensitivity, precision))
-    importance[[i]] <- rg.irri$variable.importance
+    importance[[i]] <- rg$variable.importance
   }
   colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
   message("Done!")
