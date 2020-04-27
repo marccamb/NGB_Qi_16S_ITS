@@ -1,5 +1,5 @@
 # optiranger
 
-This is an attempt to create a package allowing optimization of random forest from ranger package on microbial data.
-
-Doesn't work yet! 
+`optiranger` contains wrapping functions for random forest classification from the `ranger` package.
+It allows to train algorithms using several parameter values, and aggregating the microbial community table to 
+different taxonomic levels, to identify the best set of condition to make the classification.

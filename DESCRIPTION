@@ -1,5 +1,5 @@
 Package: optiranger
-Title: Optimisation of random forest on micrbial community data
+Title: Optimisation of random forest for classification on microbial community data
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Marine C.",
@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "cambonmarine@gmail.com",
            comment = c(ORCID = "https://orcid.org/0000-0001-5234-4196"))
-Description: What the package does (one paragraph).
+Description: `optiranger` contains wrapping functions for random forest classification from the `ranger` package. It allows to train algorithms using several parameter values, and aggregating the microbial community table to different taxonomic levels, to identify the best set of condition to make the classification.
 URL: https://github.com/marccamb/optiranger
 BugReports: https://github.com/marccamb/optiranger/issues
 License: GPL-2
