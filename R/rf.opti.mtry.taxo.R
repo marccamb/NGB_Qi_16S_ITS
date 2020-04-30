@@ -1,4 +1,4 @@
-#' Random forest optimization
+#' Random forest optimisation
 #'
 #' Runs random forest classification with several taxonomic level and mtry parameters and performs
 #' k-fold or blind cross-validation.
@@ -21,7 +21,9 @@
 #' @param RDSfile A string contaning the name of the RDS file to save the results.
 #' Default is NULL and results are not saved.
 #'
-#'@return Return....
+#'@return Returns a list of dataframes corresponding to the different taxonomic levels. Each dataframe contains
+#' the confusion matrix, sensitivity, precision and error rate obtained for each value of the mtry parameter.
+#' Mean value and standard deviation are computed over the results of the \code{cross.param} forests grown.
 #'
 #' @import ranger
 #' @export rf.opti.mtry.taxo
@@ -33,6 +35,7 @@ rf.opti.mtry.taxo <- function(tab,
                               tax.table,
                               treat,
                               n.mtry = 5,
+                              tax.lvl = c("ASV", "genus", "family", "order", "class"),
                               cross.val = "kfold",
                               train.id = NA,
                               n.tree = 100,
@@ -40,10 +43,11 @@ rf.opti.mtry.taxo <- function(tab,
                               seed = 1409,
                               RDSfile = NULL) {
 
-message("Ranger optimization starting without taxonomic aggregation of the data...")
+  if(!cross.val %in% c("kfold", "blind")) stop("possible methods for cross.val are \"kfold\" or \"blind\"")
+  message("Ranger optimisation starting without taxonomic aggregation of the data...")
   res_tot <- list()
-  for (l in c("ASV", "genus", "family", "order", "class")) {
-    if(l=="ASV") {
+  for (l in tax.lvl) {
+    if(l=="ASV|OTU") {
       tab_agg <- tab
     } else {
       tab_agg <- agg.table.taxo(tab, tax.lvl = l, tax.table)
@@ -78,7 +82,3 @@ message("Ranger optimization starting without taxonomic aggregation of the data.
   if(!is.null(RDSfile)) saveRDS(res_tot, file = RDSfile)
   return(res_tot)
 }
-
-#### To do next:
-### Blind validation is actually called non-random cross-validation
-####

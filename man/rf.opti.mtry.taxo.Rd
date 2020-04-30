@@ -2,13 +2,14 @@
 % Please edit documentation in R/rf.opti.mtry.taxo.R
 \name{rf.opti.mtry.taxo}
 \alias{rf.opti.mtry.taxo}
-\title{Random forest optimization}
+\title{Random forest optimisation}
 \usage{
 rf.opti.mtry.taxo(
   tab,
   tax.table,
   treat,
   n.mtry = 5,
+  tax.lvl = c("ASV", "genus", "family", "order", "class"),
   cross.val = "kfold",
   train.id = NA,
   n.tree = 100,
@@ -46,7 +47,9 @@ meaningful for \code{cross.val = "blind"}.}
 Default is NULL and results are not saved.}
 }
 \value{
-Return....
+Returns a list of dataframes corresponding to the different taxonomic levels. Each dataframe contains
+the confusion matrix, sensitivity, precision and error rate obtained for each value of the mtry parameter.
+Mean value and standard deviation are computed over the results of the \code{cross.param} forests grown.
 }
 \description{
 Runs random forest classification with several taxonomic level and mtry parameters and performs

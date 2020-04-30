@@ -26,7 +26,8 @@ A list object containing:
   \item a summary table with the number of true positives (TP), true negatives (TN), false positives (FP) and false negatives (FN)
 the error rate, the sensistivity \eqn{TP/(TP + FN)}, and the precision \eqn{TP/(TP + FP)}
   \item The confusion matrix
-  \item The a table containing Gini index for each variable. This index gives the variable importance for classification.
+  \item \code{n.forest} tables containing Gini index for each variable in each of the \code{n.forest} grown forests.
+  This index gives the variable importance for classification.
 }
 }
 \description{
@@ -36,6 +37,6 @@ of the \code{k} parts of the dataset to make predictions, while the other \code{
 \examples{
 tab <- asv_table_16S
 z <- samples_16S
-res <- rf.kfold(tab, treat=z$irrigation, k.fold = 5, mtry=540, seed = 1409)
+res <- rf.kfold(tab, treat=ifelse(z$irrigation=="non-irr", T, F), k.fold = 5, mtry=540, seed = 1409)
 
 }

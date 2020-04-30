@@ -16,9 +16,14 @@
 #' @param seed A number to set the seed before growing the forest. Only meaningful
 #' if n.forest == 1. The default is \code{NULL}.
 #'
-#' @return Returns a list object containing the confusion matrix, the error rate, the sensitivity
-#' the precision as well as the variable importance obtained for each of the \code{n.forest} grown
-#' forests.
+#'@return A list object containing:
+#' \itemize{
+#'   \item a summary table with the number of true positives (TP), true negatives (TN), false positives (FP) and false negatives (FN)
+#' the error rate, the sensistivity \eqn{TP/(TP + FN)}, and the precision \eqn{TP/(TP + FP)}
+#'   \item The confusion matrix
+#'   \item \code{n.forest} tables containing Gini index for each variable in each of the \code{n.forest} grown forests.
+#'   This index gives the variable importance for classification.
+#' }
 #'
 #' @import ranger
 #' @export rf.blind
