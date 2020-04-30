@@ -14,8 +14,7 @@
 # Marine Cambon
 
 agg.table.taxo <- function(tab, tax.lvl="genus", tax.table) {
-  if (any(rownames(tab) != rownames(tax.table))) stop("The ASV/OTU table and the taxonomy table should have the same
-                                                      row names. Check that they are ordered the same way")
+  if (any(rownames(tab) != rownames(tax.table))) stop("ASVs/OTUs table and taxonomy table should have the same row names. \nCheck that they are ordered the same way")
   message(paste('Table aggregation to the', tax.lvl, "level."))
   #message('Please be sure that the ASV/OTU table and the taxonomy table are ordered the same way')
   if(nrow(tab) != nrow(tax.table)) stop("The ASV/OTU table and the taxonomy table do not have the same number of rows")
