@@ -69,9 +69,14 @@ viz.rf.opti <- function(foo,
                  x.min["precision_mean"],
                  x.min["sensitivity_mean"] + x.min["sensitivity_sd"],
                  col=adjustcolor("gray", alpha.f = 0.4))
-        return(list("mean"=x.min["error_mean"], "sd"=x.min["error_sd"]))
+        return(cbind("mean"=x.min["error_mean"], "sd"=x.min["error_sd"]))
       }, d)
+      l_min <- lapply(d, function(dd) {
+        dd[which.min(dd[,"error_mean"]),]
+      })
+      return(l_min[which.min(lapply(l_min, function(ll) ll["error_mean"]))])
     }, foo, pch)
+    res_err <- err[which.min(lapply(err, function(ll) ll["error_mean"]))]
 
     # Points the minimum error rate for each taxo level and dataset
     mapply(function(files, points.type) {
@@ -83,14 +88,7 @@ viz.rf.opti <- function(foo,
                col=col)
       }, d, hue)
     },foo, pch)
-    # dirty way to extract the best model:
-    n <- paste(rep(colnames(err), each=10),
-               rep(c("ASV", "genus", "family",
-                     "order", "class"), each=2))
-    res_err <- as.data.frame(cbind(n, unlist(err)))
-    res_err[,2] <- as.numeric(as.character(res_err[,2]))
-    rowmin <- which(res_err[,2] == min(res_err[grep("mean", rownames(res_err)),2]))
-    res_err <- res_err[c(rowmin, rowmin + 1),]
+
   } else {
 # Plot with only one object from rf.opti.mtry.taxo
     if (length(pch)>1) {
