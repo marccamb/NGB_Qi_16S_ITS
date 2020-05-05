@@ -7,6 +7,8 @@
 #' @param tax.table A table containing the taxonomy of each ASV/OTU.
 #' @param treat A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
 #' This means that you should pick a class as a reference for the calculation of precision and sensitivity.
+#' @param tax.lvl A character vector containing the names of the taxonomic levels to be used for asv table
+#' aggregation. Default is \code{c("ASV", "genus", "family", "order", "class")}.
 #' @param n.mtry The number of mtry parameters to be tested. mtry values are then calculated as
 #' \code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.
 #' @param cross.val The type of cross validation to perform. Possible values are "blind" or
@@ -47,7 +49,7 @@ rf.opti.mtry.taxo <- function(tab,
   message("Ranger optimisation starting without taxonomic aggregation of the data...")
   res_tot <- list()
   for (l in tax.lvl) {
-    if(l=="ASV|OTU") {
+    if(l %in% c("ASV","OTU")) {
       tab_agg <- tab
     } else {
       tab_agg <- agg.table.taxo(tab, tax.lvl = l, tax.table)

@@ -21,9 +21,7 @@
 #' }
 #'
 #' @examples
-#' tab <- asv_table_16S
-#' z <- samples_16S
-#' res <- rf.kfold(tab, treat=ifelse(z$irrigation=="non-irr", T, F), k.fold = 5, mtry=540, seed = 1409)
+#' # Coming soon!
 #'
 #' @import ranger
 #' @export rf.kfold

@@ -29,6 +29,9 @@ This means that you should pick a class as a reference for the calculation of pr
 \item{n.mtry}{The number of mtry parameters to be tested. mtry values are then calculated as
 \code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.}
 
+\item{tax.lvl}{A character vector containing the names of the taxonomic levels to be used for asv table
+aggregation. Default is \code{c("ASV", "genus", "family", "order", "class")}.}
+
 \item{cross.val}{The type of cross validation to perform. Possible values are "blind" or
 "kfold" (Default).}
 

@@ -35,8 +35,6 @@ Splits the dataset in \code{k} and grows \code{k} random forests for classificat
 of the \code{k} parts of the dataset to make predictions, while the other \code{k-1} parts are used for the training.
 }
 \examples{
-tab <- asv_table_16S
-z <- samples_16S
-res <- rf.kfold(tab, treat=ifelse(z$irrigation=="non-irr", T, F), k.fold = 5, mtry=540, seed = 1409)
+# Coming soon!
 
 }
