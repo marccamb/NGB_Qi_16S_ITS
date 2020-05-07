@@ -72,7 +72,7 @@ rf.opti.mtry.taxo <- function(tab,
                                                 mtry = function(x) n*x/n.mtry,
                                                 n.forest = cross.param,
                                                 n.tree = n.tree)
-      res <- rbind(res, c(n*nrow(tab_agg)-1/n.mtry,
+      res <- rbind(res, c(n*(nrow(tab_agg)-1)/n.mtry,
                           tmp[["summary"]]["mean",],
                           tmp[["summary"]]["sd",]))
     }
