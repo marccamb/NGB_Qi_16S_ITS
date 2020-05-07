@@ -9,8 +9,9 @@
 #' This means that you should pick a class as a reference for the calculation of precision and sensitivity.
 #' @param tax.lvl A character vector containing the names of the taxonomic levels to be used for asv table
 #' aggregation. Default is \code{c("ASV", "genus", "family", "order", "class")}.
-#' @param n.mtry The number of mtry parameters to be tested. mtry values are then calculated as
-#' \code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.
+#' @param n.mtry The number of mtry parameters to be tested. Default is 5.
+#' @param mtry A function of \code{x = ncol(tab)}, the number of variables (i.e. ASV or OTU)
+#' and \code{n in 1:n.mtry}. Default is \code{function(x) n*x/n.mtry}.
 #' @param cross.val The type of cross validation to perform. Possible values are "blind" or
 #'  "kfold" (Default).
 #' @param train.id A string that matches the name of samples tu be used for training. Only
@@ -37,6 +38,7 @@ rf.opti.mtry.taxo <- function(tab,
                               tax.table,
                               treat,
                               n.mtry = 5,
+                              mtry = function(x) n*x/n.mtry,
                               tax.lvl = c("ASV", "genus", "family", "order", "class"),
                               cross.val = "kfold",
                               train.id = NA,
@@ -64,15 +66,15 @@ rf.opti.mtry.taxo <- function(tab,
     res <- NULL
     for (n in 1:n.mtry) {
       if (cross.val == "kfold") tmp <- rf.kfold(tab_agg, treat,
-                                                mtry = function(x) n*x/n.mtry,
+                                                mtry = mtry,
                                                 k.fold = cross.param,
                                                 n.tree = n.tree,
                                                 seed=seed)
       if (cross.val == "blind") tmp <- rf.blind(tab_agg, treat, train.id = train.id,
-                                                mtry = function(x) n*x/n.mtry,
+                                                mtry = mtry,
                                                 n.forest = cross.param,
                                                 n.tree = n.tree)
-      res <- rbind(res, c(n*nrow(tab_agg)-1/n.mtry,
+      res <- rbind(res, c(n*(nrow(tab_agg)-1)/n.mtry,
                           tmp[["summary"]]["mean",],
                           tmp[["summary"]]["sd",]))
     }
