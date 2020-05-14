@@ -40,7 +40,7 @@ viz.rf.opti <- function(foo,
 
   if (pdf.output) pdf(filename, 5, 5)
   # Setting plot parameters
-  par(mfrow=c(1,1), bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
+  par(bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
 
   # Drawing an empty plot
   plot(xlim, ylim,
