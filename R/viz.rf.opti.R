@@ -52,10 +52,10 @@ viz.rf.opti <- function(foo,
     err <- mapply(function(files, points.type) {
       d <- readRDS(files)
       err <- mapply(function(x, col) {
-        points(sensitivity_mean~precision_mean,
+        points(x[-which.min(x[,"error_mean"]),"sensitivity_mean"]~
+                   x[-which.min(x[,"error_mean"]),"precision_mean"],
                pch=points.type,
-               col=adjustcolor("lightgray", alpha.f = 0.3),
-               data=x[-which.min(x[,"error_mean"]),])
+               col=adjustcolor("lightgray", alpha.f = 0.3))
 
         x.min <- x[which.min(x[,"error_mean"]),]
         segments(x.min["precision_mean"] - x.min["precision_sd"],
