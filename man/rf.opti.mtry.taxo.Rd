@@ -9,6 +9,7 @@ rf.opti.mtry.taxo(
   tax.table,
   treat,
   n.mtry = 5,
+  mtry = function(x) n * x/n.mtry,
   tax.lvl = c("ASV", "genus", "family", "order", "class"),
   cross.val = "kfold",
   train.id = NA,
@@ -26,8 +27,10 @@ rf.opti.mtry.taxo(
 \item{treat}{A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
 This means that you should pick a class as a reference for the calculation of precision and sensitivity.}
 
-\item{n.mtry}{The number of mtry parameters to be tested. mtry values are then calculated as
-\code{1:n.mtry*(ncol(tab)-1)/n.mtry}. Default is 5.}
+\item{n.mtry}{The number of mtry parameters to be tested. Default is 5.}
+
+\item{mtry}{A function of \code{x = ncol(tab)}, the number of variables (i.e. ASV or OTU)
+and \code{n in 1:n.mtry}. Default is \code{function(x) n*x/n.mtry}.}
 
 \item{tax.lvl}{A character vector containing the names of the taxonomic levels to be used for asv table
 aggregation. Default is \code{c("ASV", "genus", "family", "order", "class")}.}

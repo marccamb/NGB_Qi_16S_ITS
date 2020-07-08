@@ -6,18 +6,23 @@
 \usage{
 viz.rf.opti(
   foo,
+  plot = TRUE,
   xlim = c(0, 1),
   ylim = c(0, 1),
   pch = c(22, 21, 24, 15, 16, 17),
   hue = c("#9a394e", "#d68157", "#f3d577", "#84b368", "#00876c"),
+  axis.labels = c("Mean precision", "Mean sensitivity"),
   default.legend = F,
   pdf.output = F,
   filename = NULL
 )
 }
 \arguments{
-\item{foo}{The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively, a vector of full names (including their path) of RDS files containing outputs of
-the function \code{\link{rf.opti.mtry.taxo}}.}
+\item{foo}{The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively, a vector of full names
+(including their path) of RDS files containing outputs of the function \code{\link{rf.opti.mtry.taxo}}.}
+
+\item{plot}{Wether to plot the graph. Default is TRUE. If FALSE, only returns the features of the best prediction (see 'Value').
+(and sd) obtained and the name of the corresponding RDS file and taxonomic level}
 
 \item{xlim}{A vector of lenght two giving the range of the x-axis. Dafault is c(0,1).}
 
@@ -28,6 +33,8 @@ the function \code{\link{rf.opti.mtry.taxo}}.}
 \item{hue}{A vector containing colors for each taxnonomic levels. Default is a diverging color
 palette of length 5.}
 
+\item{axis.labels}{A a vector of length 2 containing x-axis and y-axis labels.}
+
 \item{default.legend}{Whether to display the default legend. Plotting your own legend is
 recommended. Default = F.}
 
@@ -36,8 +43,7 @@ recommended. Default = F.}
 \item{filename}{The filename and path where to save the pdf plot (only meaningful when pdf.output = T)}
 }
 \value{
-Returns the minimum mean error rate (and sd) obtained and the name of the corresponding RDS file and
-taxonomic level
+Returns the features of the best prediction (i.e. giving the lowest mean error rate).
 }
 \description{
 Visualization of the results obtained via \code{\link{rf.opti.mtry.taxo}}. Plot the mean (+/- sd) sensitivity
