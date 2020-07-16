@@ -12,8 +12,8 @@ viz.rf.opti(
   pch = c(22, 21, 24, 15, 16, 17),
   hue = c("#9a394e", "#d68157", "#f3d577", "#84b368", "#00876c"),
   axis.labels = c("Mean precision", "Mean sensitivity"),
-  default.legend = F,
-  pdf.output = F,
+  default.legend = TRUE,
+  pdf.output = FALSE,
   filename = NULL
 )
 }
@@ -35,8 +35,7 @@ palette of length 5.}
 
 \item{axis.labels}{A a vector of length 2 containing x-axis and y-axis labels.}
 
-\item{default.legend}{Whether to display the default legend. Plotting your own legend is
-recommended. Default = F.}
+\item{default.legend}{Whether to display the default legend. Default = T.}
 
 \item{pdf.output}{Whether to save the plot in a pdf file. Default = F.}
 

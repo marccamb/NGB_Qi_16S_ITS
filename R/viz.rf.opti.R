@@ -13,8 +13,7 @@
 #' @param hue A vector containing colors for each taxnonomic levels. Default is a diverging color
 #'   palette of length 5.
 #' @param axis.labels A a vector of length 2 containing x-axis and y-axis labels.
-#' @param default.legend Whether to display the default legend. Plotting your own legend is
-#'   recommended. Default = F.
+#' @param default.legend Whether to display the default legend. Default = T.
 #' @param pdf.output Whether to save the plot in a pdf file. Default = F.
 #' @param filename The filename and path where to save the pdf plot (only meaningful when pdf.output = T)
 #'
@@ -29,8 +28,8 @@ viz.rf.opti <- function(foo, plot = TRUE,
                         xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,17),
                         hue=c("#9a394e","#d68157","#f3d577","#84b368","#00876c"),
                         axis.labels = c("Mean precision","Mean sensitivity"),
-                        default.legend = F,
-                        pdf.output = F, filename = NULL) {
+                        default.legend = TRUE,
+                        pdf.output = FALSE, filename = NULL) {
   # Check if foo contains RDS file names
   RDSfiles = F
   if (class(foo)!="list") {
@@ -41,18 +40,20 @@ viz.rf.opti <- function(foo, plot = TRUE,
     }
   }
 
-  if (pdf.output) pdf(filename, 5, 5)
+  if (plot & pdf.output) pdf(filename, 5, 5)
   # Setting plot parameters
   if (plot) {
-  par(bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
+    tax.lvl <- names(readRDS(foo[1]))
+    if (length(tax.lvl) != length(hue)) warning("The hue vector and the taxonomic levels do not have the same length.")
+    par(bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
 
-  # Drawing an empty plot
-  plot(xlim, ylim,
-       type="n", xlab=axis.labels[1], ylab=axis.labels[2])
+    # Drawing an empty plot
+    plot(xlim, ylim,
+         type="n", xlab=axis.labels[1], ylab=axis.labels[2])
   }
   # plot with multiple RDS files
   if (RDSfiles) {
-    if (plot & length(foo) != length(pch)) warning("The pch vector and the file vector do not have the same lenght.")
+    if (plot & length(foo) != length(pch)) warning("The pch vector and the file vector do not have the same length.")
     err <- mapply(function(files, points.type) {
       d <- readRDS(files)
       err <- mapply(function(x, col) {
@@ -102,6 +103,9 @@ viz.rf.opti <- function(foo, plot = TRUE,
     if (length(pch)>1) {
       warning("There is only one object to plot. Only the first value of pch will be used.")
     }
+    tax.lvl <- names(foo)
+    if (length(tax.lvl) != length(hue)) warning("The hue vector and the taxonomic levels do not have the same length.")
+
     err <- mapply(function(x, col) {
       x.min <- x[which.min(x[,"error_mean"]),]
       if(plot) {
@@ -137,19 +141,14 @@ viz.rf.opti <- function(foo, plot = TRUE,
   }
 
   if (plot & default.legend) {
-    legend("topleft", pch=pch, col=1, bty = "n",
-           legend=c("Abundant ASVs, bacteria + fungi",
-                    "Abundant ASVs, bacteria",
-                    "Abundant ASVs, fungi",
-                    "All ASVs, bacteria + fungi",
-                    "All ASVs, bacteria",
-                    "All ASVs, fungi"),
+    legend("topleft", pch=pch[1:length(foo)], col=1, bty = "n",
+           legend=gsub("^.*/(.*)\\.RDS$", "\\1", foo),
            cex = 0.7)
 
-    legend("left", pch=16, col=hue, bty = "n",
-           legend=c("ASV", "Genus", "Family", "Class", "Order"),
+    legend("left", pch=16, col=hue[1:length(tax.lvl)], bty = "n",
+           legend=tax.lvl,
            cex = 0.7)
   }
-  if (pdf.output) dev.off()
+  if (plot & pdf.output) dev.off()
   return(res_err)
 }
