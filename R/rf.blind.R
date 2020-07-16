@@ -8,7 +8,8 @@
 #' This means that you should pick a class as a reference for the calculation of precision and sensitivity.
 #' @param train.id A charecter sting to be searched in samples names that will be used for training.
 #' Can be a regular expression. Can alernatively be a boolean vector saying wether or not each sample
-#' is part of the training dataset(TRUE for training samples, FALSE for testing samples).
+#' is part of the training dataset(TRUE for training samples, FALSE for testing samples), or a character
+#' vector containing the training sample names.
 #' @param mtry The mtry parameter to be passed to the \code{ranger} function.
 #' See \code{ranger} documentation for details.
 #' @param n.tree The number of tree to grow. The default is \code{500}.
@@ -37,10 +38,21 @@ rf.blind <- function(tab, treat,
                      n.tree = 500,
                      n.forest = 10,
                      seed=NULL) {
-  if(any(!treat %in% c("TRUE", "FALSE"))) stop("treat is not a boolean vector")
+  if(class(treat) != "logical") stop("treat is not a boolean vector")
   treat <- ifelse(treat, "positive", "negative")
 
-  train.idx <- grep(train.id, colnames(tab))
+  if(length(train.id)==1) {
+    train.idx <- grep(train.id, colnames(tab))
+  } else {
+    if(class(train.id) == "logical") {
+      train.idx <- which(train.id)
+    } else {
+      train.idx <- which(colnames(tab) %in% train.id)
+    }
+  }
+  if(length(train.idx)==1) warning("The training dataset only contains 1 sample")
+  if(length(train.idx)==0) stop("train.id does not match sample names")
+
   tab <- data.frame("treat" = treat, t(tab))
   train <- tab[train.idx, ]
   test <- tab[-train.idx, ]

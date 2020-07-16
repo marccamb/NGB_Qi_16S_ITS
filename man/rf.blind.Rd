@@ -7,7 +7,7 @@
 rf.blind(
   tab,
   treat,
-  train.id = NA,
+  train.id,
   mtry = NULL,
   n.tree = 500,
   n.forest = 10,
@@ -22,7 +22,8 @@ This means that you should pick a class as a reference for the calculation of pr
 
 \item{train.id}{A charecter sting to be searched in samples names that will be used for training.
 Can be a regular expression. Can alernatively be a boolean vector saying wether or not each sample
-is part of the training dataset(TRUE for training samples, FALSE for testing samples).}
+is part of the training dataset(TRUE for training samples, FALSE for testing samples), or a character
+vector containing the training sample names.}
 
 \item{mtry}{The mtry parameter to be passed to the \code{ranger} function.
 See \code{ranger} documentation for details.}
