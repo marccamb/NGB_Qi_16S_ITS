@@ -32,7 +32,7 @@
 # Marine C. Cambon
 
 rf.blind <- function(tab, treat,
-                     train.id = NA,
+                     train.id,
                      mtry = NULL,
                      n.tree = 500,
                      n.forest = 10,
