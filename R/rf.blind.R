@@ -12,7 +12,7 @@
 #' @param mtry The mtry parameter to be passed to the \code{ranger} function.
 #' See \code{ranger} documentation for details.
 #' @param n.tree The number of tree to grow. The default is \code{500}.
-#' @param n.forest The number of forests to grow. The default is \code{100}.
+#' @param n.forest The number of forests to grow. The default is \code{10}.
 #' @param seed A number to set the seed before growing the forest. Only meaningful
 #' if n.forest == 1. The default is \code{NULL}.
 #'
@@ -35,7 +35,7 @@ rf.blind <- function(tab, treat,
                      train.id = NA,
                      mtry = NULL,
                      n.tree = 500,
-                     n.forest = 100,
+                     n.forest = 10,
                      seed=NULL) {
   if(any(!treat %in% c("TRUE", "FALSE"))) stop("treat is not a boolean vector")
   treat <- ifelse(treat, "positive", "negative")
