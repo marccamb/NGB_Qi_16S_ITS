@@ -40,6 +40,7 @@ rf.blind <- function(tab, treat,
                      seed=NULL) {
   if(class(treat) != "logical") stop("treat is not a boolean vector")
   treat <- ifelse(treat, "positive", "negative")
+  treat <- as.factor(treat)
 
   if(length(train.id)==1) {
     train.idx <- grep(train.id, colnames(tab))

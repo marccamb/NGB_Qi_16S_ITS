@@ -37,8 +37,9 @@ rf.kfold <- function(tab, treat,
                      seed = NULL) {
   if(any(!treat %in% c("TRUE", "FALSE"))) stop("treat is not a boolean vector")
   treat <- ifelse(treat, "positive", "negative")
+  treat <- as.factor(treat)
   # Preparing training IDs and dataframe
-  if (!is.na(seed)) set.seed(seed)
+  if (!is.null(seed)) set.seed(seed)
   train.idx <- sample(rep(1:k.fold, 1/k.fold * ncol(tab)), replace = F)
   tab_agg <- data.frame("treat" = treat, t(tab))
 
