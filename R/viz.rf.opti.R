@@ -6,17 +6,19 @@
 #' @param foo The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively, a vector of full names
 #' (including their path, usually obtained with \code{list.files(pattern=".*RDS", full.names=T)}) of RDS files
 #' containing outputs of the function \code{\link{rf.opti.mtry.taxo}}.
-#' @param plot Wether to plot the graph. Default is TRUE. If FALSE, only returns the features of the best
+#' @param plot Whether to plot the graph. Default is TRUE. If FALSE, only returns the features of the best
 #' prediction (see 'Value').
-#' @param xlim A vector of lenght two giving the range of the x-axis. Dafault is c(0,1).
-#' @param ylim A vector of lenght two giving the range of the y-axis. Dafault is c(0,1).
-#' @param pch A vector of the same lenght as foo containing pch for plotting. Default is c(22,21,24,15,16,17).
-#' @param hue A vector containing colors for each taxnonomic levels. Default is a diverging color
+#' @param plot Whether to plot the results from all mtry values. Default is TRUE. If FALSE, only the
+#' results for the best mtry parameters will be plotted.
+#' @param xlim A vector of length two giving the range of the x-axis. Default is c(0,1).
+#' @param ylim A vector of length two giving the range of the y-axis. Default is c(0,1).
+#' @param pch A vector of the same length as foo containing pch for plotting. Default is c(22,21,24,15,16,17).
+#' @param hue A vector containing colors for each taxonomic levels. Default is a diverging color
 #' palette of length 5.
 #' @param axis.labels A a vector of length 2 containing x-axis and y-axis labels.
 #' @param default.legend Whether to display the default legend. Default = T.
 #' @param pdf.output Whether to save the plot in a pdf file. Default = F.
-#' @param filename The filename and path where to save the pdf plot (only meaningful when pdf.output = T).
+#' @param filename The file name and path where to save the pdf plot (only meaningful when pdf.output = T).
 #'
 #' @return Returns the features of the best prediction (i.e. giving the lowest mean error rate), including the
 #' corresponding file name and taxonomic level.
@@ -30,7 +32,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
                         xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,17),
                         hue=c("#9a394e","#d68157","#f3d577","#84b368","#00876c"),
                         axis.labels = c("Mean precision","Mean sensitivity"),
-                        default.legend = TRUE,
+                        default.legend = TRUE, all_mtry=FALSE,
                         pdf.output = FALSE, filename = NULL) {
   # Check if foo contains RDS file names
   RDSfiles = F
@@ -61,11 +63,12 @@ viz.rf.opti <- function(foo, plot = TRUE,
       err <- mapply(function(x, col) {
         x.min <- x[which.min(x[,"error_mean"]),]
         if(plot) {
-          points(x[-which.min(x[,"error_mean"]),"sensitivity_mean"]~
-                   x[-which.min(x[,"error_mean"]),"precision_mean"],
-                 pch=points.type,
-                 col=adjustcolor("lightgray", alpha.f = 0.3))
-
+          if(all_mtry) {
+            points(x[-which.min(x[,"error_mean"]),"sensitivity_mean"]~
+                     x[-which.min(x[,"error_mean"]),"precision_mean"],
+                   pch=points.type,
+                   col=adjustcolor("lightgray", alpha.f = 0.3))
+          }
 
           segments(x.min["precision_mean"] - x.min["precision_sd"],
                    x.min["sensitivity_mean"],
