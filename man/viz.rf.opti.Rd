@@ -13,38 +13,55 @@ viz.rf.opti(
   hue = c("#9a394e", "#d68157", "#f3d577", "#84b368", "#00876c"),
   axis.labels = c("Mean precision", "Mean sensitivity"),
   default.legend = TRUE,
+  all_mtry = FALSE,
+  display_tax = NULL,
   pdf.output = FALSE,
   filename = NULL
 )
 }
 \arguments{
-\item{foo}{The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively, a vector of full names
-(including their path) of RDS files containing outputs of the function \code{\link{rf.opti.mtry.taxo}}.}
+\item{foo}{The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively,
+a vector of full names (including their path, usually obtained with
+\code{list.files(pattern=".*RDS", full.names=T)}) of RDS files
+containing outputs of the function \code{\link{rf.opti.mtry.taxo}}.}
 
-\item{plot}{Wether to plot the graph. Default is TRUE. If FALSE, only returns the features of the best prediction (see 'Value').
-(and sd) obtained and the name of the corresponding RDS file and taxonomic level}
+\item{plot}{Whether to plot the graph. Default is TRUE. If FALSE, only returns
+the features of the best prediction (see 'Value').}
 
-\item{xlim}{A vector of lenght two giving the range of the x-axis. Dafault is c(0,1).}
+\item{xlim}{A vector of length two giving the range of the x-axis.
+Default is c(0,1).}
 
-\item{ylim}{A vector of lenght two giving the range of the y-axis. Dafault is c(0,1).}
+\item{ylim}{A vector of length two giving the range of the y-axis.
+Default is c(0,1).}
 
-\item{pch}{A vector of the same lenght as foo containing pch for plotting. Default is c(22,21,24,15,16,17).}
+\item{pch}{A vector of the same length as foo containing pch for plotting.
+Default is c(22,21,24,15,16,17).}
 
-\item{hue}{A vector containing colors for each taxnonomic levels. Default is a diverging color
-palette of length 5.}
+\item{hue}{A vector containing colors for each taxonomic levels.
+Default is a diverging color palette of length 5.}
 
 \item{axis.labels}{A a vector of length 2 containing x-axis and y-axis labels.}
 
 \item{default.legend}{Whether to display the default legend. Default = T.}
 
+\item{all_mtry}{Whether to plot the results from all mtry values. Default is
+TRUE. If FALSE, only the results for the best mtry parameters will be plotted.}
+
+\item{display_tax}{An optionnal vector of the names of the taxonomic levels
+to plot. Default = NULL plot all levels.}
+
 \item{pdf.output}{Whether to save the plot in a pdf file. Default = F.}
 
-\item{filename}{The filename and path where to save the pdf plot (only meaningful when pdf.output = T)}
+\item{filename}{The file name and path where to save the pdf plot (only
+meaningful when pdf.output = T).}
 }
 \value{
-Returns the features of the best prediction (i.e. giving the lowest mean error rate).
+Returns the features of the best prediction (i.e. giving the lowest
+mean error rate), including the
+corresponding file name and taxonomic level.
 }
 \description{
-Visualization of the results obtained via \code{\link{rf.opti.mtry.taxo}}. Plot the mean (+/- sd) sensitivity
- and mean (+/- sd) precision of each models obtained for each set of parameters and/or dataset
+Visualization of the results obtained via \code{\link{rf.opti.mtry.taxo}}.
+Plot the mean (+/- sd) sensitivity and mean (+/- sd) precision of each models
+ obtained for each set of parameters and/or dataset
 }

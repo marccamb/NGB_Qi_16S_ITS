@@ -1,26 +1,35 @@
 #' Visualization of random forest optimization
 #'
-#' Visualization of the results obtained via \code{\link{rf.opti.mtry.taxo}}. Plot the mean (+/- sd) sensitivity
-#'  and mean (+/- sd) precision of each models obtained for each set of parameters and/or dataset
+#' Visualization of the results obtained via \code{\link{rf.opti.mtry.taxo}}.
+#' Plot the mean (+/- sd) sensitivity and mean (+/- sd) precision of each models
+#'  obtained for each set of parameters and/or dataset
 #'
-#' @param foo The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively, a vector of full names
-#' (including their path, usually obtained with \code{list.files(pattern=".*RDS", full.names=T)}) of RDS files
+#' @param foo The output of \code{\link{rf.opti.mtry.taxo}}, or alternatively,
+#' a vector of full names (including their path, usually obtained with
+#' \code{list.files(pattern=".*RDS", full.names=T)}) of RDS files
 #' containing outputs of the function \code{\link{rf.opti.mtry.taxo}}.
-#' @param plot Whether to plot the graph. Default is TRUE. If FALSE, only returns the features of the best
-#' prediction (see 'Value').
-#' @param plot Whether to plot the results from all mtry values. Default is TRUE. If FALSE, only the
-#' results for the best mtry parameters will be plotted.
-#' @param xlim A vector of length two giving the range of the x-axis. Default is c(0,1).
-#' @param ylim A vector of length two giving the range of the y-axis. Default is c(0,1).
-#' @param pch A vector of the same length as foo containing pch for plotting. Default is c(22,21,24,15,16,17).
-#' @param hue A vector containing colors for each taxonomic levels. Default is a diverging color
-#' palette of length 5.
+#' @param plot Whether to plot the graph. Default is TRUE. If FALSE, only returns
+#'  the features of the best prediction (see 'Value').
+#' @param all_mtry Whether to plot the results from all mtry values. Default is
+#' TRUE. If FALSE, only the results for the best mtry parameters will be plotted.
+#' @param display_tax An optionnal vector of the names of the taxonomic levels
+#' to plot. Default = NULL plot all levels.
+#' @param xlim A vector of length two giving the range of the x-axis.
+#' Default is c(0,1).
+#' @param ylim A vector of length two giving the range of the y-axis.
+#' Default is c(0,1).
+#' @param pch A vector of the same length as foo containing pch for plotting.
+#' Default is c(22,21,24,15,16,17).
+#' @param hue A vector containing colors for each taxonomic levels.
+#' Default is a diverging color palette of length 5.
 #' @param axis.labels A a vector of length 2 containing x-axis and y-axis labels.
 #' @param default.legend Whether to display the default legend. Default = T.
 #' @param pdf.output Whether to save the plot in a pdf file. Default = F.
-#' @param filename The file name and path where to save the pdf plot (only meaningful when pdf.output = T).
+#' @param filename The file name and path where to save the pdf plot (only
+#' meaningful when pdf.output = T).
 #'
-#' @return Returns the features of the best prediction (i.e. giving the lowest mean error rate), including the
+#' @return Returns the features of the best prediction (i.e. giving the lowest
+#' mean error rate), including the
 #' corresponding file name and taxonomic level.
 #'
 #' @export viz.rf.opti
@@ -32,7 +41,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
                         xlim = c(0,1), ylim = c(0,1), pch=c(22,21,24,15,16,17),
                         hue=c("#9a394e","#d68157","#f3d577","#84b368","#00876c"),
                         axis.labels = c("Mean precision","Mean sensitivity"),
-                        default.legend = TRUE, all_mtry=FALSE,
+                        default.legend = TRUE, all_mtry=FALSE, display_tax=NULL,
                         pdf.output = FALSE, filename = NULL) {
   # Check if foo contains RDS file names
   RDSfiles = F
@@ -47,7 +56,11 @@ viz.rf.opti <- function(foo, plot = TRUE,
   if (plot & pdf.output) pdf(filename, 5, 5)
   # Setting plot parameters
   if (plot) {
-    tax.lvl <- names(readRDS(foo[1]))
+    if(is.null(display_tax)) {
+      tax.lvl <- names(readRDS(foo[1]))
+    } else {
+      tax.lvl <- display_tax
+    }
     if (length(tax.lvl) != length(hue)) warning("The hue vector and the taxonomic levels do not have the same length.")
     par(bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
 
@@ -60,6 +73,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
     if (plot & length(foo) != length(pch)) warning("The pch vector and the file vector do not have the same length.")
     err <- mapply(function(files, points.type) {
       d <- readRDS(files)
+      if (!is.null(display_tax)) d <- d[names(d) %in% display_tax]
       err <- mapply(function(x, col) {
         x.min <- x[which.min(x[,"error_mean"]),]
         if(plot) {
@@ -95,6 +109,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
     if(plot) {
       mapply(function(files, points.type) {
         d <- readRDS(files) # This is not optimal, I read each RDS file two times!
+        if (!is.null(display_tax)) d <- d[names(d) %in% display_tax]
         mapply(function(x, col){
           x.min <- x[which.min(x[,"error_mean"]),]
           points(x.min["sensitivity_mean"]~x.min["precision_mean"], cex=2,
@@ -108,7 +123,11 @@ viz.rf.opti <- function(foo, plot = TRUE,
     if (length(pch)>1) {
       warning("There is only one object to plot. Only the first value of pch will be used.")
     }
-    tax.lvl <- names(foo)
+    if(is.null(display_tax)) {
+      tax.lvl <- names(readRDS(foo[1]))
+    } else {
+      tax.lvl <- display_tax
+    }
     if (length(tax.lvl) != length(hue)) warning("The hue vector and the taxonomic levels do not have the same length.")
 
     err <- mapply(function(x, col) {
