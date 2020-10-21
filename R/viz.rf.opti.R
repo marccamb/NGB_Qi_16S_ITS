@@ -75,6 +75,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
       d <- readRDS(files)
       if (!is.null(display_tax)) d <- d[names(d) %in% display_tax]
       err <- mapply(function(x, col) {
+        x <- x[apply(x, 1, function(r) !any(!is.finite(r))),]
         x.min <- x[which.min(x[,"error_mean"]),]
         if(plot) {
           if(all_mtry) {
@@ -111,6 +112,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
         d <- readRDS(files) # This is not optimal, I read each RDS file two times!
         if (!is.null(display_tax)) d <- d[names(d) %in% display_tax]
         mapply(function(x, col){
+          x <- x[apply(x, 1, function(r) !any(!is.finite(r))),]
           x.min <- x[which.min(x[,"error_mean"]),]
           points(x.min["sensitivity_mean"]~x.min["precision_mean"], cex=2,
                  pch=points.type, bg="white",
@@ -131,6 +133,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
     if (length(tax.lvl) != length(hue)) warning("The hue vector and the taxonomic levels do not have the same length.")
 
     err <- mapply(function(x, col) {
+      x <- x[apply(x, 1, function(r) !any(!is.finite(r))),]
       x.min <- x[which.min(x[,"error_mean"]),]
       if(plot) {
         points(sensitivity_mean~precision_mean,
@@ -154,6 +157,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
     # Points the minimum error rate for each taxo level
     if(plot) {
       mapply(function(x, col){
+        x <- x[apply(x, 1, function(r) !any(!is.finite(r))),]
         x.min <- x[which.min(x[,"error_mean"]),]
         points(x.min["sensitivity_mean"]~x.min["precision_mean"], cex=2,
                pch=pch[1], bg="white",

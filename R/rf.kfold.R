@@ -57,7 +57,7 @@ rf.kfold <- function(tab, treat,
     test <- tab_agg[train.idx == i, ]
 
     # Grow the forest and make predictions
-    if (!is.na(seed)) set.seed(seed)
+    if (!is.null(seed)) set.seed(seed)
     rg <- ranger::ranger(treat ~ ., data = train,
                  num.trees = n.tree,
                  mtry = mtry,
