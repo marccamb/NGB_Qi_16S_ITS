@@ -16,7 +16,8 @@ viz.rf.opti(
   all_mtry = FALSE,
   display_tax = NULL,
   pdf.output = FALSE,
-  filename = NULL
+  filename = NULL,
+  ...
 )
 }
 \arguments{

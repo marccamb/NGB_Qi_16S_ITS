@@ -13,5 +13,6 @@ BugReports: https://github.com/marccamb/optiranger/issues
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: ranger
+Imports: ranger,
+         purrr
 RoxygenNote: 7.1.1
