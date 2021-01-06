@@ -104,16 +104,10 @@ viz.rf.opti <- function(foo, plot = TRUE,
                    x.min["sensitivity_mean"] + x.min["sensitivity_sd"],
                    col=adjustcolor("gray", alpha.f = 0.4))
         }
-        # return(cbind("mean"=x.min["error_mean"], "sd"=x.min["error_sd"]))
         return(x.min)
       })
       err <- do.call(rbind, err)
       rownames(err) <- names(d)
-
-      # l_min <- lapply(d, function(dd) {
-      #   dd[which.min(dd[,"error_mean"]),]
-      # })
-      # return(l_min[which.min(lapply(l_min, function(ll) ll["error_mean"]))])
       return(err)
     })
     names(res_err) <- lapply(strsplit(foo, "/"), function(x) x[length(x)])
@@ -121,11 +115,6 @@ viz.rf.opti <- function(foo, plot = TRUE,
     # Points the minimum error rate for each taxo level and dataset
     if(plot) {
       purrr::walk2(res_err, pch, function(x, points.type) {
-        # d <- readRDS(files) # This is not optimal, I read each RDS file two times!
-        # if (!is.null(display_tax)) d <- d[names(d) %in% display_tax]
-        # mapply(function(x, col){
-        #   x <- x[apply(x, 1, function(r) !any(!is.finite(r))),]
-        #   x.min <- x[which.min(x[,"error_mean"]),]
           points(x[,"sensitivity_mean"]~x[,"precision_mean"], cex=2,
                  pch=points.type, bg="white",
                  col=hue)
