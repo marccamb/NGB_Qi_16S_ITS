@@ -61,7 +61,7 @@ rf.kfold <- function(tab, treat,
     rg <- ranger::ranger(treat ~ ., data = train,
                  num.trees = n.tree,
                  mtry = mtry,
-                 importance = "impurity")
+                 importance = "impurity_corrected")
     pred <- stats::predict(rg, data = test)
 
     # Store the variables

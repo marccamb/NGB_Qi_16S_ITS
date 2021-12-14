@@ -55,6 +55,8 @@ to plot. Default = NULL plot all levels.}
 
 \item{filename}{The file name and path where to save the pdf plot (only
 meaningful when pdf.output = T).}
+
+\item{...}{Other graphical parameters to pass to plot().}
 }
 \value{
 Returns the features of the best prediction (i.e. giving the lowest
