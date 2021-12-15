@@ -64,7 +64,7 @@ rf.opti.mtry.taxo <- function(tab,
     }
 
     res <- NULL
-    for (n in 1:n.mtry) {
+    for (i.mtry in 1:n.mtry) {
       if (cross.val == "kfold") tmp <- rf.kfold(tab_agg, treat,
                                                 mtry = mtry,
                                                 k.fold = cross.param,
@@ -74,7 +74,7 @@ rf.opti.mtry.taxo <- function(tab,
                                                 mtry = mtry,
                                                 n.forest = cross.param,
                                                 n.tree = n.tree)
-      res <- rbind(res, c(n*(nrow(tab_agg)-1)/n.mtry,
+      res <- rbind(res, c(i.mtry*(nrow(tab_agg)-1)/n.mtry,
                           tmp[["summary"]]["mean",],
                           tmp[["summary"]]["sd",]))
     }
