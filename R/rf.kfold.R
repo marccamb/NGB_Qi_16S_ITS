@@ -61,7 +61,7 @@ rf.kfold <- function(tab, treat,
     rg <- ranger::ranger(treat ~ ., data = train,
                  num.trees = n.tree,
                  mtry = mtry,
-                 importance = "impurity_corrected")
+                 importance = "impurity")
     pred <- stats::predict(rg, data = test)
 
     # Store the variables
@@ -74,7 +74,9 @@ rf.kfold <- function(tab, treat,
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
     res <- rbind(res,c(TN,TP,FN,FP,error,sensitivity,precision))
-    importance[[i]] <- ranger::importance(rg)
+    importance[[i]] <- ranger::importance_pvalues(rg, method = "altmann",
+                                                  formula=treat ~ .,
+                                                  data = train)
   }
   colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
   rownames(res) <- paste("kfold_", 1:k.fold,sep="")

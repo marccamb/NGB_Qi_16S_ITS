@@ -65,7 +65,7 @@ rf.blind <- function(tab, treat,
     rg <- ranger::ranger(treat ~ ., data = train,
                       num.trees = n.tree,
                       mtry = mtry,
-                      importance = "impurity_corrected")
+                      importance = "impurity")
 
     pred <- stats::predict(rg, data = test)
     tmp <- data.frame(table(pred$predictions, test$treat))
@@ -77,7 +77,7 @@ rf.blind <- function(tab, treat,
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
     res <- rbind(res, c(TP, TN, FP, FN, error, sensitivity, precision))
-    importance[[i]] <- rg$variable.importance
+    importance[[i]] <- ranger::importance_pvalues(rg, method = "janitza")
   }
   colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
   message("Done!")
