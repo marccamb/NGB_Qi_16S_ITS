@@ -77,7 +77,9 @@ rf.blind <- function(tab, treat,
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
     res <- rbind(res, c(TP, TN, FP, FN, error, sensitivity, precision))
-    importance[[i]] <- ranger::importance_pvalues(rg, method = "janitza")
+    importance[[i]] <- ranger::importance_pvalues(rg, method = "altmann",
+                                                  formula=treat ~ .,
+                                                  data = train)
   }
   colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
   message("Done!")
