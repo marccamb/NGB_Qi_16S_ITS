@@ -9,7 +9,7 @@ rf.opti.mtry.taxo(
   tax.table,
   treat,
   n.mtry = 5,
-  mtry = function(x) n * x/n.mtry,
+  mtry = function(x) i.mtry * x/n.mtry * 0.5,
   tax.lvl = c("ASV", "genus", "family", "order", "class"),
   cross.val = "kfold",
   train.id = NA,
