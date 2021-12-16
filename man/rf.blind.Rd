@@ -11,6 +11,7 @@ rf.blind(
   mtry = NULL,
   n.tree = 500,
   n.forest = 10,
+  importance_p = F,
   seed = NULL
 )
 }
@@ -31,6 +32,10 @@ See \code{ranger} documentation for details.}
 \item{n.tree}{The number of tree to grow. The default is \code{500}.}
 
 \item{n.forest}{The number of forests to grow. The default is \code{10}.}
+
+\item{importance_p}{A boolean defining if the p-value should be computed for the importance of
+variable. For now, the importance is the Gini index, and the p-value is estimated by permutation with
+the Altmann method. See ranger documentation for details}
 
 \item{seed}{A number to set the seed before growing the forest. Only meaningful
 if n.forest == 1. The default is \code{NULL}.}

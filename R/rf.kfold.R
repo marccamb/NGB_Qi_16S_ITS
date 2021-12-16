@@ -9,6 +9,9 @@
 #' @param k.fold A number of fold to be applied for k-fold cross-valisation.
 #' @param mtry The mtry parameter to be passed to the \code{ranger} function. See \code{ranger} documentation for details.
 #' @param n.tree The number of tree to grow in each of the \code{k} forests. The default is \code{500}.
+#' @param importance_p A boolean defining if the p-value should be computed for the importance of
+#' variable. For now, the importance is the Gini index, and the p-value is estimated by permutation with
+#' the Altmann method. See ranger documentation for details
 #' @param seed A number to set the seed before before growing each forest. The default is \code{NULL}.
 #'
 #' @return A list object containing:
@@ -34,6 +37,7 @@ rf.kfold <- function(tab, treat,
                      k.fold = 5,
                      mtry = NULL,
                      n.tree = 500,
+                     importance_p = F,
                      seed = NULL) {
   if(any(!treat %in% c("TRUE", "FALSE"))) stop("treat is not a boolean vector")
   treat <- ifelse(treat, "positive", "negative")
@@ -74,9 +78,12 @@ rf.kfold <- function(tab, treat,
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
     res <- rbind(res,c(TN,TP,FN,FP,error,sensitivity,precision))
-    importance[[i]] <- ranger::importance_pvalues(rg, method = "altmann",
-                                                  formula=treat ~ .,
-                                                  data = train)
+    if (importance_p) {importance[[i]] <- ranger::importance_pvalues(rg, method = "altmann",
+                                                                     formula=treat ~ .,
+                                                                     data = train)
+    } else {
+      importance[[i]] <- rg$variable.importance
+    }
   }
   colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
   rownames(res) <- paste("kfold_", 1:k.fold,sep="")

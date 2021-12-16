@@ -4,7 +4,15 @@
 \alias{rf.kfold}
 \title{k-fold cross validation for random forest}
 \usage{
-rf.kfold(tab, treat, k.fold = 5, mtry = NULL, n.tree = 500, seed = NULL)
+rf.kfold(
+  tab,
+  treat,
+  k.fold = 5,
+  mtry = NULL,
+  n.tree = 500,
+  importance_p = F,
+  seed = NULL
+)
 }
 \arguments{
 \item{tab}{An abundance table containing samples in columns and OTUs/ASV in rows.}
@@ -17,6 +25,10 @@ This means that you should pick a class as a reference for the calculation of pr
 \item{mtry}{The mtry parameter to be passed to the \code{ranger} function. See \code{ranger} documentation for details.}
 
 \item{n.tree}{The number of tree to grow in each of the \code{k} forests. The default is \code{500}.}
+
+\item{importance_p}{A boolean defining if the p-value should be computed for the importance of
+variable. For now, the importance is the Gini index, and the p-value is estimated by permutation with
+the Altmann method. See ranger documentation for details}
 
 \item{seed}{A number to set the seed before before growing each forest. The default is \code{NULL}.}
 }
