@@ -74,11 +74,11 @@ rf.opti.mtry.taxo <- function(tab,
                                                 mtry = mtry,
                                                 n.forest = cross.param,
                                                 n.tree = n.tree)
-      res <- rbind(res, c(i.mtry*(nrow(tab_agg)-1)/n.mtry,
-                          tmp[["summary"]]["mean",],
+      res <- rbind(res, c(tmp[["summary"]]["mean",],
                           tmp[["summary"]]["sd",]))
     }
-    colnames(res) <- c("mtry", paste(colnames(tmp[["summary"]]), "mean", sep="_"), paste(colnames(tmp[["summary"]]), "sd", sep="_"))
+    colnames(res) <- c(paste(colnames(tmp[["summary"]]), "mean", sep="_"),
+                       paste(colnames(tmp[["summary"]]), "sd", sep="_"))
     res_tot[[l]] <- res
 
     message(l, " lvl is done\n")

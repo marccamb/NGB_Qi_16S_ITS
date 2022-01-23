@@ -77,7 +77,7 @@ rf.kfold <- function(tab, treat,
     error <- sum(test$treat != pred$predictions)/nrow(test)
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
-    res <- rbind(res,c(TN,TP,FN,FP,error,sensitivity,precision))
+    res <- rbind(res,c(rg$mtry,TN,TP,FN,FP,error,sensitivity,precision))
     if (importance_p) {importance[[i]] <- ranger::importance_pvalues(rg, method = "altmann",
                                                                      formula=treat ~ .,
                                                                      data = train)
@@ -85,8 +85,8 @@ rf.kfold <- function(tab, treat,
       importance[[i]] <- rg$variable.importance
     }
   }
-  colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
-  rownames(res) <- paste("kfold_", 1:k.fold,sep="")
+  colnames(res) <- c("mtry","TN","TP","FN","FP","error","sensitivity","precision")
+  rownames(res) <- paste("kfold_", 1:k.fold, sep="")
   names(importance) <- paste("kfold_", 1:k.fold,sep="")
 
   summary <- rbind(apply(res,2,mean),apply(res,2,sd))

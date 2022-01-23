@@ -80,7 +80,7 @@ rf.blind <- function(tab, treat,
     error <- sum(test$treat != pred$predictions)/nrow(test)
     sensitivity <- TP/(TP+FN)
     precision <- TP/(TP+FP)
-    res <- rbind(res, c(TP, TN, FP, FN, error, sensitivity, precision))
+    res <- rbind(res, c(rg$mtry, TP, TN, FP, FN, error, sensitivity, precision))
     if (importance_p) {importance[[i]] <- ranger::importance_pvalues(rg, method = "altmann",
                                                   formula=treat ~ .,
                                                   data = train)
@@ -88,7 +88,7 @@ rf.blind <- function(tab, treat,
       importance[[i]] <- rg$variable.importance
     }
   }
-  colnames(res) <- c("TN","TP","FN","FP","error","sensitivity","precision")
+  colnames(res) <- c("mtry","TN","TP","FN","FP","error","sensitivity","precision")
   message("Done!")
   summary <- rbind(apply(res,2,mean),apply(res,2,sd))
   rownames(summary) <- c("mean", "sd")
