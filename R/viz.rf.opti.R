@@ -65,7 +65,7 @@ viz.rf.opti <- function(foo, plot = TRUE,
     if (length(tax.lvl) != length(hue)) warning("The hue vector and the taxonomic levels do not have the same length.")
 
     # Drawing an empty plot
-    par(bty="l",las=1, mar=c(4,5,2,1), col.axis="gray", cex.lab=1.5)
+    par(bty="l",las=1, mar=c(4,5,2,1), col.axis="gray30", cex.lab=1.5)
     plot(xlim, ylim,
          type="n", xlab=axis.labels[1], ylab=axis.labels[2], ...)
   }
