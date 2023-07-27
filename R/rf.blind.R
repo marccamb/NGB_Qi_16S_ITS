@@ -6,10 +6,10 @@
 #' @param tab An abundance or presence absence table containing samples in columns and OTUs/ASV in rows.
 #' @param treat A boolean vector containing the class identity of each sample, i.e. the treatment to predict.
 #' This means that you should pick a class as a reference for the calculation of precision and sensitivity.
-#' @param train.id A charecter sting to be searched in samples names that will be used for training.
+#' @param test.id A charecter sting to be searched in samples names that will be used for testing.
 #' Can be a regular expression. Can alernatively be a boolean vector saying wether or not each sample
-#' is part of the training dataset(TRUE for training samples, FALSE for testing samples), or a character
-#' vector containing the training sample names.
+#' is part of the testing or training dataset (TRUE for testing samples, FALSE for training samples), or a character
+#' vector containing the testing sample names.
 #' @param mtry The mtry parameter to be passed to the \code{ranger} function.
 #' See \code{ranger} documentation for details.
 #' @param n.tree The number of tree to grow. The default is \code{500}.
@@ -36,7 +36,7 @@
 # Marine C. Cambon
 
 rf.blind <- function(tab, treat,
-                     train.id,
+                     test.id,
                      mtry = NULL,
                      n.tree = 500,
                      n.forest = 10,
@@ -46,21 +46,21 @@ rf.blind <- function(tab, treat,
   treat <- ifelse(treat, "positive", "negative")
   treat <- as.factor(treat)
 
-  if(length(train.id)==1) {
-    train.idx <- grep(train.id, colnames(tab))
+  if(length(test.id)==1) {
+    test.idx <- grep(test.id, colnames(tab))
   } else {
-    if(class(train.id) == "logical") {
-      train.idx <- which(train.id)
+    if(class(test.id) == "logical") {
+      test.idx <- which(test.id)
     } else {
-      train.idx <- which(colnames(tab) %in% train.id)
+      test.idx <- which(colnames(tab) %in% test.id)
     }
   }
-  if(length(train.idx)==1) warning("The training dataset only contains 1 sample")
-  if(length(train.idx)==0) stop("train.id does not match sample names")
+  if(length(test.idx)==1) warning("The testing dataset only contains 1 sample")
+  if(length(test.idx)==0) stop("test.id does not match sample names")
 
   tab <- data.frame("treat" = treat, t(tab))
-  train <- tab[train.idx, ]
-  test <- tab[-train.idx, ]
+  train <- tab[-test.idx, ]
+  test <- tab[test.idx, ]
   res <- data.frame()
   importance <- list()
   message("Growing ", n.forest, " forests...")
