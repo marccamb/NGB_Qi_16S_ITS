@@ -14,8 +14,10 @@
 #' and \code{n in 1:n.mtry}. Default is \code{function(x) n*x/n.mtry}.
 #' @param cross.val The type of cross validation to perform. Possible values are "blind" or
 #'  "kfold" (Default).
-#' @param train.id A string that matches the name of samples tu be used for training. Only
-#' meaningful for \code{cross.val = "blind"}.
+#' @param test.id A charecter sting to be searched in samples names that will be used for testing.
+#' Can be a regular expression. Can alernatively be a boolean vector saying wether or not each sample
+#' is part of the testing or training dataset (TRUE for testing samples, FALSE for training samples), or a character
+#' vector containing the testing sample names. Only meaningful for \code{cross.val = "blind"}.
 #' @param n.tree The number of tree to grow for each forest. Default is 100.
 #' @param cross.param The parameter needed for cross validation: the number of folds for
 #' \code{cross.val = "kfold"} or the number of forests to grow for \code{cross.val = "blind"}. Default is 5.
@@ -41,7 +43,7 @@ rf.opti.mtry.taxo <- function(tab,
                               mtry = function(x) i.mtry*x/n.mtry*0.5+1,
                               tax.lvl = c("ASV", "genus", "family", "order", "class"),
                               cross.val = "kfold",
-                              train.id = NA,
+                              test.id = NA,
                               n.tree = 100,
                               cross.param = 5,
                               seed = 1409,
@@ -70,7 +72,7 @@ rf.opti.mtry.taxo <- function(tab,
                                                 k.fold = cross.param,
                                                 n.tree = n.tree,
                                                 seed=seed)
-      if (cross.val == "blind") tmp <- rf.blind(tab_agg, treat, train.id = train.id,
+      if (cross.val == "blind") tmp <- rf.blind(tab_agg, treat, test.id = test.id,
                                                 mtry = mtry,
                                                 n.forest = cross.param,
                                                 n.tree = n.tree)
