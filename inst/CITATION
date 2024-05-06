@@ -1,0 +1,12 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "Microbial biomarkers of tree water status for next-generation biomonitoring of forest ecosystems",
+  author = "Marine C. Cambon, Marine Trillat, Isabelle Lesur-Kupin, Régis Burlett, Emilie Chancerel, Erwan Guichoux, Lucie Piouceau, Bastien Castagneyrol, Grégoire Le Provost, Stéphane Robin, Yves Ritter, Inge Van Halder, Sylvain Delzon, David A. Bohan, Corinne Vacher",
+  year = "2023",
+  journal = "Molecular Ecology",
+  volume = "32",
+  number = "22",
+  pages = "5944--5958",
+  issn = "1365-294X",
+  doi = "10.1111/mec.17149",
+)
