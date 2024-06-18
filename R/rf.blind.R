@@ -88,7 +88,7 @@ rf.blind <- function(tab, treat,
       importance[[i]] <- rg$variable.importance
     }
   }
-  colnames(res) <- c("mtry","TN","TP","FN","FP","error","sensitivity","precision")
+  colnames(res) <- c("mtry","TP","TN","FP","FN","error","sensitivity","precision")
   message("Done!")
   summary <- rbind(apply(res,2,mean),apply(res,2,sd))
   rownames(summary) <- c("mean", "sd")
